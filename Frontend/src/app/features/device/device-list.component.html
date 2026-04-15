@@ -1,0 +1,21 @@
+<button nz-button nzType="primary">Them thiet bi</button>
+
+<nz-table [nzData]="devices" nzBordered>
+  <thead>
+    <tr>
+      <th>Ten</th>
+      <th>Ma</th>
+      <th>So luong</th>
+      <th>Trang thai</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let d of devices">
+      <td>{{ d.name }}</td>
+      <td>{{ d.code }}</td>
+      <td>{{ d.quantity }}</td>
+      <td>{{ d.status }}</td>
+    </tr>
+  </tbody>
+</nz-table>

@@ -1,0 +1,17 @@
+<nz-header class="app-header">
+  <div class="header-left">
+    <button nz-button nzType="text" class="menu-trigger" (click)="onToggleMenu()">
+      <span nz-icon [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></span>
+    </button>
+    <div class="brand-block">
+      <p class="eyebrow">Device Hub</p>
+      <h1>Device Management System</h1>
+    </div>
+  </div>
+
+  <div class="header-right">
+      <button nz-button nzType="primary" (click)="logout()">
+        Đăng xuất
+      </button>
+  </div>
+</nz-header>

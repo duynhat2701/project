@@ -9,9 +9,6 @@ import lombok.Setter;
 @Setter
 public class RequestDTO {
 
-    @NotNull(message = "User ID is required")
-    private Long userId;
-
     @NotNull(message = "Device ID is required")
     private Long deviceId;
 

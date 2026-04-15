@@ -29,8 +29,8 @@ public class RequestService {
         this.deviceRepository = deviceRepository;
     }
 
-    public RequestResponse create(RequestDTO dto) {
-        User user = userRepository.findById(dto.getUserId())
+    public RequestResponse create(RequestDTO dto, String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         Device device = deviceRepository.findById(dto.getDeviceId())

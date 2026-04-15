@@ -1,0 +1,24 @@
+<div class="sidebar-shell">
+  <div class="sidebar-brand" [class.sidebar-brand-collapsed]="isCollapsed">
+    <div class="brand-mark">DH</div>
+    <div class="brand-copy" *ngIf="!isCollapsed">
+      <strong>Device Hub</strong>
+      <span>Admin workspace</span>
+    </div>
+  </div>
+
+  <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed" class="sidebar-menu">
+    <li nz-menu-item routerLink="/dashboard" routerLinkActive="ant-menu-item-selected">
+      <span nz-icon nzType="dashboard"></span>
+      <span>Dashboard</span>
+    </li>
+    <li nz-menu-item routerLink="/devices" routerLinkActive="ant-menu-item-selected">
+      <span nz-icon nzType="appstore"></span>
+      <span>Thiet bi</span>
+    </li>
+    <li nz-menu-item routerLink="/borrow" routerLinkActive="ant-menu-item-selected">
+      <span nz-icon nzType="form"></span>
+      <span>Muon / Tra</span>
+    </li>
+  </ul>
+</div>

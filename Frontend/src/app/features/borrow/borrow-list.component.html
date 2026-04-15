@@ -1,0 +1,28 @@
+<nz-table [nzData]="list" nzBordered>
+  <thead>
+  <tr>
+    <th>Nguoi muon</th>
+    <th>Thiet bi</th>
+    <th>So luong</th>
+    <th>Ngay muon</th>
+    <th>Ngay tra</th>
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr *ngFor="let b of list">
+    <td>{{ b.userName }}</td>
+    <td>{{ b.deviceName }}</td>
+    <td>{{ b.quantity }}</td>
+    <td>{{ b.borrowDate }}</td>
+    <td>{{ b.returnDate || '-' }}</td>
+    <td>{{ b.status }}</td>
+    <td>
+      <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">Return</button>
+      <span *ngIf="b.status !== 'BORROWING'">-</span>
+    </td>
+  </tr>
+  </tbody>
+</nz-table>

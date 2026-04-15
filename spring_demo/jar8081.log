@@ -1,0 +1,49 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.5)
+
+2026-04-03T15:30:17.643+07:00  INFO 2620 --- [           main] c.e.spring_demo.SpringDemoApplication    : Starting SpringDemoApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 2620 (C:\Users\nhatl\IdeaProjects\spring_demo\target\spring_demo-0.0.1-SNAPSHOT.jar started by nhatl in C:\Users\nhatl\IdeaProjects\spring_demo)
+2026-04-03T15:30:17.650+07:00  INFO 2620 --- [           main] c.e.spring_demo.SpringDemoApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-04-03T15:30:18.559+07:00  INFO 2620 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-03T15:30:18.636+07:00  INFO 2620 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 53 ms. Found 1 JPA repository interface.
+2026-04-03T15:30:19.341+07:00  INFO 2620 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-04-03T15:30:19.355+07:00  INFO 2620 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-03T15:30:19.356+07:00  INFO 2620 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-03T15:30:19.394+07:00  INFO 2620 --- [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1647 ms
+2026-04-03T15:30:19.625+07:00  INFO 2620 --- [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-03T15:30:19.687+07:00  INFO 2620 --- [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-04-03T15:30:20.469+07:00  INFO 2620 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-03T15:30:20.567+07:00  INFO 2620 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-03T15:30:20.952+07:00  INFO 2620 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@290c266c
+2026-04-03T15:30:20.955+07:00  INFO 2620 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-03T15:30:21.007+07:00  WARN 2620 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-03T15:30:21.044+07:00  INFO 2620 --- [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/taskdb]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.3
+	Default catalog/schema: taskdb/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-03T15:30:22.103+07:00  INFO 2620 --- [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-03T15:30:22.211+07:00  INFO 2620 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-03T15:30:22.407+07:00  INFO 2620 --- [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-03T15:30:23.203+07:00  INFO 2620 --- [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-04-03T15:30:23.215+07:00  INFO 2620 --- [           main] c.e.spring_demo.SpringDemoApplication    : Started SpringDemoApplication in 6.039 seconds (process running for 6.672)
+2026-04-03T15:30:42.527+07:00  INFO 2620 --- [nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-03T15:30:42.528+07:00  INFO 2620 --- [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-03T15:30:42.530+07:00  INFO 2620 --- [nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+Hibernate: insert into products (image,image_content_type,image_data,name,price) values (?,?,?,?,?)
+Hibernate: select p1_0.id,p1_0.image,p1_0.image_content_type,p1_0.image_data,p1_0.name,p1_0.price from products p1_0 where p1_0.id=?
+Hibernate: select p1_0.id,p1_0.image,p1_0.image_content_type,p1_0.image_data,p1_0.name,p1_0.price from products p1_0 where p1_0.id=?
+Hibernate: delete from products where id=?
