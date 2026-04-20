@@ -6,7 +6,7 @@ import { ApiResponse } from '../../shared/models/api-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class BorrowService {
-  private readonly api = 'http://localhost:8080/api/borrows';
+  private readonly api = 'https://project-1-y5rk.onrender.com';
 
   constructor(private http: HttpClient) {}
 

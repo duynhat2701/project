@@ -33,7 +33,7 @@ export interface UserResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'http://localhost:8080/api';
+  private readonly baseUrl = 'https://project-1-y5rk.onrender.com';
   private readonly tokenKey = 'token';
   private readonly userKey = 'currentUser';
 
