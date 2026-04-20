@@ -16,12 +16,11 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:4200",
-                                "http://127.0.0.1:4200",
-                                "http://localhost:5173",
-                                "http://127.0.0.1:5173"
+                                "https://glittery-monstera-85a622.netlify.app"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
