@@ -33,7 +33,7 @@ export interface UserResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'https://project-1-y5rk.onrender.com/api/auth';
+  private readonly baseUrl = 'https://project-1-y5rk.onrender.com/api';
   private readonly tokenKey = 'token';
   private readonly userKey = 'currentUser';
 
@@ -43,8 +43,8 @@ export class AuthService {
     return this.http.post<ApiResponse<LoginResponse>>(`${this.baseUrl}/auth/login`, data).pipe(
       map((response) => response.data),
       tap((response) => {
-        this.saveToken(response.token);
-        this.saveUser(response);
+        localStorage.setItem(this.tokenKey, response.token);
+        localStorage.setItem(this.userKey, JSON.stringify(response));
       }),
     );
   }
@@ -55,33 +55,8 @@ export class AuthService {
     );
   }
 
-  saveToken(token: string): void {
-    localStorage.setItem(this.tokenKey, token);
-  }
-
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
-  }
-
-  saveUser(user: LoginResponse): void {
-    localStorage.setItem(this.userKey, JSON.stringify(user));
-  }
-
-  getUser(): LoginResponse | null {
-    const rawUser = localStorage.getItem(this.userKey);
-    return rawUser ? (JSON.parse(rawUser) as LoginResponse) : null;
-  }
-
-  isAuthenticated(): boolean {
-    return !!this.getToken() && !!this.getUser();
-  }
-
-  isAdmin(): boolean {
-    return this.getUser()?.role === 'ADMIN';
-  }
-
-  isEmployee(): boolean {
-    return this.getUser()?.role === 'EMPLOYEE';
   }
 
   logout(): void {
