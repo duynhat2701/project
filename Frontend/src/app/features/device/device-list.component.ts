@@ -58,11 +58,16 @@ export class DeviceListComponent implements OnInit {
     this.deviceService
       .getAll()
       .pipe(
-        timeout(10000),
+        timeout(15000),
         takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
           console.error('Load devices error:', err);
-          this.errorMessage = err?.error?.message || 'Không tải được danh sách thiết bị.';
+          this.errorMessage =
+            err?.status === 0
+              ? 'Không kết nối được server.'
+              : err?.status === 504 || err?.name === 'TimeoutError'
+                ? 'Server đang khởi động, vui lòng thử lại sau vài giây.'
+                : err?.error?.message || 'Không tải được danh sách thiết bị.';
           return of([]);
         }),
         finalize(() => {
@@ -89,7 +94,7 @@ export class DeviceListComponent implements OnInit {
     this.deviceService
       .create(this.form.getRawValue())
       .pipe(
-        timeout(10000),
+        timeout(15000),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.submitting = false;
@@ -108,7 +113,16 @@ export class DeviceListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Create device error:', err);
-          this.errorMessage = err?.error?.message || 'Thêm thiết bị thất bại.';
+          this.errorMessage =
+            err?.status === 403
+              ? 'Bạn không có quyền thêm thiết bị.'
+              : err?.status === 401
+                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                : err?.status === 0
+                  ? 'Không kết nối được server.'
+                  : err?.name === 'TimeoutError'
+                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
+                    : err?.error?.message || 'Thêm thiết bị thất bại.';
           this.cdr.detectChanges();
         },
       });
@@ -126,7 +140,7 @@ export class DeviceListComponent implements OnInit {
     this.deviceService
       .delete(id)
       .pipe(
-        timeout(10000),
+        timeout(15000),
         takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.loading = false;
@@ -134,9 +148,7 @@ export class DeviceListComponent implements OnInit {
         }),
       )
       .subscribe({
-        next: () => {
-          this.loadData();
-        },
+        next: () => this.loadData(),
         error: (err) => {
           console.error('Delete device error:', err);
           this.errorMessage = err?.error?.message || 'Xóa thiết bị thất bại.';
