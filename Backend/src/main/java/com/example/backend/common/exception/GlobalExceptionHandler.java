@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
                 .badRequest()
                 .body(new ApiResponse<>(
                         HttpStatus.BAD_REQUEST.value(),
-                        ex.getMessage(),
+                        "Validation failed",
                         null
                 ));
     }
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(new ApiResponse<>(
                         HttpStatus.UNAUTHORIZED.value(),
-                        ex.getMessage(),
+                        "Invalid email or password",
                         null
                 ));
     }
@@ -78,13 +78,13 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse<>(
                         HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                        ex.getMessage(),
+                        "Internal server error",
                         null
                 ));
     }

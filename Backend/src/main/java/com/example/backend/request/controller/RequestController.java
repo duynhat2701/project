@@ -42,4 +42,12 @@ public class RequestController {
     public ApiResponse<List<RequestResponse>> getAll() {
         return ApiResponse.success("Requests fetched successfully", requestService.getAll());
     }
+
+    @GetMapping("/my")
+    public ApiResponse<List<RequestResponse>> getMy(Authentication authentication) {
+        return ApiResponse.success(
+                "My requests fetched successfully",
+                requestService.getMy(authentication.getName())
+        );
+    }
 }

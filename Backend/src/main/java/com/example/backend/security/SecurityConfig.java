@@ -42,16 +42,25 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.GET, "/api/devices/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/devices/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/devices/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/devices/**").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.POST, "/api/requests").hasRole("EMPLOYEE")
-                        .requestMatchers(HttpMethod.GET, "/api/requests").hasAnyRole("ADMIN", "EMPLOYEE")
-                        .requestMatchers("/api/borrows/approve/**", "/api/approve/**").hasRole("ADMIN")
-                        .requestMatchers("/api/borrows/return/**", "/api/return/**").hasRole("ADMIN")
-                        .requestMatchers("/api/borrows/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers(HttpMethod.GET, "/api/requests/my").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/requests").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/borrows/approve/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/borrows/return/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/borrows/my").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/borrows").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

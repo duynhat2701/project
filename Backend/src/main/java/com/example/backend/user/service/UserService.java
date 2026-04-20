@@ -38,8 +38,12 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password is required");
+        }
+
         User user = new User();
-        applyChanges(user, dto);
+        applyChanges(user, dto, true);
         return toResponse(userRepository.save(user));
     }
 
@@ -50,7 +54,7 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
 
-        applyChanges(user, dto);
+        applyChanges(user, dto, false);
         return toResponse(userRepository.save(user));
     }
 
@@ -64,14 +68,26 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-    private void applyChanges(User user, UserDTO dto) {
+    private void applyChanges(User user, UserDTO dto, boolean creatingNewUser) {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(resolveRole(dto.getRole(), user.getId() == null));
+
+        if (creatingNewUser) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            return;
+        }
+
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
     }
 
     private String resolveRole(String requestedRole, boolean creatingNewUser) {
+        if (requestedRole == null || requestedRole.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role is required");
+        }
+
         if (!creatingNewUser) {
             return requestedRole.toUpperCase();
         }
