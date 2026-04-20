@@ -43,6 +43,12 @@ export class RegisterComponent {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
+  constructor() {
+    if (this.authService.isAuthenticated()) {
+      void this.router.navigate(['/dashboard']);
+    }
+  }
+
   protected submit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
@@ -72,7 +78,7 @@ export class RegisterComponent {
           }, 1200);
         },
         error: () => {
-          this.errorMessage = 'Dang ky that bai. Vui long thu lai.';
+          this.errorMessage = 'Đăng ký thất bại. Vui lòng thử lại.';
         },
       });
   }

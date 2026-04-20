@@ -2,7 +2,9 @@
   <div class="auth-hero">
     <p class="auth-eyebrow">Create account</p>
     <h1>Tạo tài khoản mới cho hệ thống</h1>
-    <p class="auth-copy">Đăng ký người dùng mới để truy cập dashboard, quản lý thiết bị và phiếu mượn trả.</p>
+    <p class="auth-copy">
+      Đăng ký người dùng mới để truy cập dashboard, quản lý thiết bị và phiếu mượn trả.
+    </p>
   </div>
 
   <nz-card class="auth-card">
@@ -10,7 +12,12 @@
     <p class="auth-card-copy">Điền đầy đủ thông tin để tạo tài khoản mới.</p>
 
     <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
-    <nz-alert *ngIf="isSuccess" nzType="success" nzMessage="Dang ky thanh cong. Dang chuyen sang trang dang nhap." nzShowIcon></nz-alert>
+    <nz-alert
+      *ngIf="isSuccess"
+      nzType="success"
+      nzMessage="Đăng ký thành công. Đang chuyển sang trang đăng nhập."
+      nzShowIcon
+    ></nz-alert>
 
     <form nz-form [formGroup]="registerForm" (ngSubmit)="submit()" class="auth-form">
       <nz-form-item>
@@ -30,7 +37,7 @@
       </nz-form-item>
 
       <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 kí tự'">
+        <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
           <nz-input-group nzPrefixIcon="lock">
             <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
           </nz-input-group>

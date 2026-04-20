@@ -6,20 +6,25 @@ import { Device } from '../../shared/models/device.model';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
-
-  private api = 'http://localhost:8080/api/devices';
+  private readonly api = 'http://localhost:8080/api/devices';
 
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Device[]> {
-    return this.http.get<ApiResponse<Device[]>>(this.api).pipe(map((response) => response.data));
+    return this.http.get<ApiResponse<Device[]>>(this.api).pipe(
+      map((response) => response.data ?? []),
+    );
   }
 
   create(data: Partial<Device>): Observable<Device> {
-    return this.http.post<ApiResponse<Device>>(this.api, data).pipe(map((response) => response.data));
+    return this.http.post<ApiResponse<Device>>(this.api, data).pipe(
+      map((response) => response.data),
+    );
   }
 
   delete(id: number): Observable<void> {
-    return this.http.delete<ApiResponse<void>>(`${this.api}/${id}`).pipe(map(() => void 0));
+    return this.http.delete<ApiResponse<void>>(`${this.api}/${id}`).pipe(
+      map(() => void 0),
+    );
   }
 }

@@ -1,12 +1,14 @@
 <div class="auth-shell">
   <div class="auth-hero">
-    <p class="auth-eyebrow"></p>
-    <h1>Đăng nhập hệ thống quản lí thiết bị</h1>
-    <p class="auth-copy">Theo dõi thiết bị, duyệt yêu cầu mượn trả và quản lí danh mục trong một giao diện.</p>
+    <p class="auth-eyebrow">Device Hub</p>
+    <h1>Đăng nhập hệ thống quản lý thiết bị</h1>
+    <p class="auth-copy">
+      Theo dõi thiết bị, duyệt yêu cầu mượn trả và quản lý danh mục trong một giao diện.
+    </p>
   </div>
 
   <nz-card class="auth-card">
-    <h2>Đăng Nhập</h2>
+    <h2>Đăng nhập</h2>
     <p class="auth-card-copy">Sử dụng tài khoản đã được cấp để truy cập hệ thống.</p>
 
     <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
@@ -21,14 +23,14 @@
       </nz-form-item>
 
       <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 kí tự'">
+        <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
           <nz-input-group nzPrefixIcon="lock">
-            <input nz-input type="password" formControlName="password" placeholder="Mat khau" />
+            <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
 
-      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting">Đăng Nhập</button>
+      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting">Đăng nhập</button>
     </form>
 
     <p class="auth-switch">

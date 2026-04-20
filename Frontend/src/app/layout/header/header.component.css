@@ -46,17 +46,6 @@
   padding-top: 6px;
 }
 
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: #e8fff2;
-  color: #0f9f6e;
-  font-size: 0.82rem;
-  font-weight: 600;
-}
-
 @media (max-width: 768px) {
   .app-header {
     padding: 16px 16px 0;
@@ -64,9 +53,5 @@
 
   .brand-block h1 {
     font-size: 1.05rem;
-  }
-
-  .status-pill {
-    display: none;
   }
 }

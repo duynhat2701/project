@@ -24,16 +24,23 @@ export interface LoginResponse {
   role: string;
 }
 
+export interface UserResponse {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private api = 'http://localhost:8080/api/auth';
-  private tokenKey = 'token';
-  private userKey = 'currentUser';
+  private readonly baseUrl = 'http://localhost:8080/api';
+  private readonly tokenKey = 'token';
+  private readonly userKey = 'currentUser';
 
   constructor(private http: HttpClient) {}
 
   login(data: LoginPayload): Observable<LoginResponse> {
-    return this.http.post<ApiResponse<LoginResponse>>(`${this.api}/login`, data).pipe(
+    return this.http.post<ApiResponse<LoginResponse>>(`${this.baseUrl}/auth/login`, data).pipe(
       map((response) => response.data),
       tap((response) => {
         this.saveToken(response.token);
@@ -42,8 +49,10 @@ export class AuthService {
     );
   }
 
-  register(data: RegisterPayload): Observable<unknown> {
-    return this.http.post<ApiResponse<unknown>>('http://localhost:8080/api/users', data).pipe(map((response) => response.data));
+  register(data: RegisterPayload): Observable<UserResponse> {
+    return this.http.post<ApiResponse<UserResponse>>(`${this.baseUrl}/users`, data).pipe(
+      map((response) => response.data),
+    );
   }
 
   saveToken(token: string): void {
@@ -54,10 +63,6 @@ export class AuthService {
     return localStorage.getItem(this.tokenKey);
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getToken();
-  }
-
   saveUser(user: LoginResponse): void {
     localStorage.setItem(this.userKey, JSON.stringify(user));
   }
@@ -65,6 +70,18 @@ export class AuthService {
   getUser(): LoginResponse | null {
     const rawUser = localStorage.getItem(this.userKey);
     return rawUser ? (JSON.parse(rawUser) as LoginResponse) : null;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken() && !!this.getUser();
+  }
+
+  isAdmin(): boolean {
+    return this.getUser()?.role === 'ADMIN';
+  }
+
+  isEmployee(): boolean {
+    return this.getUser()?.role === 'EMPLOYEE';
   }
 
   logout(): void {

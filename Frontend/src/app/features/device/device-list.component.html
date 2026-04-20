@@ -1,21 +1,46 @@
-<button nz-button nzType="primary">Them thiet bi</button>
+<nz-card nzTitle="Danh sách thiết bị">
+  <div *ngIf="errorMessage" style="margin-bottom: 16px; color: #d4380d; font-weight: 500;">
+    {{ errorMessage }}
+  </div>
 
-<nz-table [nzData]="devices" nzBordered>
-  <thead>
+  <ng-container *ngIf="authService.isAdmin()">
+    <form nz-form [formGroup]="form" (ngSubmit)="submit()" style="margin-bottom: 24px;">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+        <input nz-input formControlName="name" placeholder="Tên thiết bị" />
+        <input nz-input formControlName="code" placeholder="Mã thiết bị" />
+        <input nz-input type="number" formControlName="quantity" placeholder="Số lượng" />
+        <input nz-input formControlName="status" placeholder="AVAILABLE / OUT_OF_STOCK" />
+      </div>
+
+      <div style="margin-top:12px;">
+        <button nz-button nzType="primary" [nzLoading]="submitting">
+          Thêm thiết bị
+        </button>
+      </div>
+    </form>
+  </ng-container>
+
+  <nz-table [nzData]="devices" [nzLoading]="loading" nzBordered>
+    <thead>
     <tr>
-      <th>Ten</th>
-      <th>Ma</th>
-      <th>So luong</th>
-      <th>Trang thai</th>
+      <th>Tên</th>
+      <th>Mã</th>
+      <th>Số lượng</th>
+      <th>Trạng thái</th>
+      <th *ngIf="authService.isAdmin()">Thao tác</th>
     </tr>
-  </thead>
+    </thead>
 
-  <tbody>
+    <tbody>
     <tr *ngFor="let d of devices">
       <td>{{ d.name }}</td>
       <td>{{ d.code }}</td>
       <td>{{ d.quantity }}</td>
       <td>{{ d.status }}</td>
+      <td *ngIf="authService.isAdmin()">
+        <button nz-button nzDanger (click)="deleteDevice(d.id)">Xóa</button>
+      </td>
     </tr>
-  </tbody>
-</nz-table>
+    </tbody>
+  </nz-table>
+</nz-card>

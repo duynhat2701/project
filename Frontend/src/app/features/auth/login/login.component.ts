@@ -41,6 +41,12 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
+  constructor() {
+    if (this.authService.isAuthenticated()) {
+      void this.router.navigate(['/dashboard']);
+    }
+  }
+
   protected submit(): void {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
@@ -58,7 +64,7 @@ export class LoginComponent {
           void this.router.navigate(['/dashboard']);
         },
         error: () => {
-          this.errorMessage = 'Dang nhap that bai. Vui long kiem tra tai khoan.';
+          this.errorMessage = 'Đăng nhập thất bại. Vui lòng kiểm tra tài khoản.';
         },
       });
   }

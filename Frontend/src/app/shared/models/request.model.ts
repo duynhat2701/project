@@ -1,11 +1,9 @@
-export interface Borrow {
+export interface RequestItem {
   id: number;
   userId: number;
   userName: string;
   deviceId: number;
   deviceName: string;
   quantity: number;
-  borrowDate: string;
-  returnDate: string | null;
   status: string;
 }

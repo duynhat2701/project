@@ -1,28 +1,135 @@
-<nz-table [nzData]="list" nzBordered>
-  <thead>
-  <tr>
-    <th>Nguoi muon</th>
-    <th>Thiet bi</th>
-    <th>So luong</th>
-    <th>Ngay muon</th>
-    <th>Ngay tra</th>
-    <th>Status</th>
-    <th>Action</th>
-  </tr>
-  </thead>
+<div *ngIf="errorMessage" style="margin-bottom: 16px; color: #d4380d; font-weight: 500;">
+  {{ errorMessage }}
+</div>
 
-  <tbody>
-  <tr *ngFor="let b of list">
-    <td>{{ b.userName }}</td>
-    <td>{{ b.deviceName }}</td>
-    <td>{{ b.quantity }}</td>
-    <td>{{ b.borrowDate }}</td>
-    <td>{{ b.returnDate || '-' }}</td>
-    <td>{{ b.status }}</td>
-    <td>
-      <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">Return</button>
-      <span *ngIf="b.status !== 'BORROWING'">-</span>
-    </td>
-  </tr>
-  </tbody>
-</nz-table>
+<div *ngIf="successMessage" style="margin-bottom: 16px; color: #389e0d; font-weight: 500;">
+  {{ successMessage }}
+</div>
+
+<ng-container *ngIf="authService.isEmployee(); else adminView">
+  <nz-card nzTitle="Tạo yêu cầu mượn" style="margin-bottom: 24px;">
+    <form nz-form [formGroup]="requestForm" (ngSubmit)="submitRequest()">
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:12px;">
+        <select formControlName="deviceId" style="height:32px;padding:4px 8px;">
+          <option [ngValue]="0">Chọn thiết bị</option>
+          <option *ngFor="let d of devices" [ngValue]="d.id">
+            {{ d.name }} - còn {{ d.quantity }}
+          </option>
+        </select>
+
+        <input nz-input type="number" formControlName="quantity" placeholder="Số lượng" />
+
+        <button nz-button nzType="primary" [nzLoading]="submitting">
+          Gửi yêu cầu
+        </button>
+      </div>
+    </form>
+  </nz-card>
+
+  <nz-card nzTitle="Yêu cầu của tôi" style="margin-bottom: 24px;">
+    <nz-table [nzData]="requests" [nzLoading]="loading" nzBordered>
+      <thead>
+      <tr>
+        <th>Thiết bị</th>
+        <th>Số lượng</th>
+        <th>Trạng thái</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let r of requests">
+        <td>{{ r.deviceName }}</td>
+        <td>{{ r.quantity }}</td>
+        <td>{{ r.status }}</td>
+      </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+
+  <nz-card nzTitle="Phiếu mượn của tôi">
+    <nz-table [nzData]="borrows" [nzLoading]="loading" nzBordered>
+      <thead>
+      <tr>
+        <th>Thiết bị</th>
+        <th>Số lượng</th>
+        <th>Ngày mượn</th>
+        <th>Ngày trả</th>
+        <th>Trạng thái</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let b of borrows">
+        <td>{{ b.deviceName }}</td>
+        <td>{{ b.quantity }}</td>
+        <td>{{ b.borrowDate }}</td>
+        <td>{{ b.returnDate || '-' }}</td>
+        <td>{{ b.status }}</td>
+      </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</ng-container>
+
+<ng-template #adminView>
+  <nz-card nzTitle="Danh sách yêu cầu" style="margin-bottom: 24px;">
+    <nz-table [nzData]="requests" [nzLoading]="loading" nzBordered>
+      <thead>
+      <tr>
+        <th>Người mượn</th>
+        <th>Thiết bị</th>
+        <th>Số lượng</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let r of requests">
+        <td>{{ r.userName }}</td>
+        <td>{{ r.deviceName }}</td>
+        <td>{{ r.quantity }}</td>
+        <td>{{ r.status }}</td>
+        <td>
+          <button nz-button nzType="primary" *ngIf="r.status === 'PENDING'" (click)="approveRequest(r.id)">
+            Duyệt
+          </button>
+          <span *ngIf="r.status !== 'PENDING'">-</span>
+        </td>
+      </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+
+  <nz-card nzTitle="Danh sách mượn / trả">
+    <nz-table [nzData]="borrows" [nzLoading]="loading" nzBordered>
+      <thead>
+      <tr>
+        <th>Người mượn</th>
+        <th>Thiết bị</th>
+        <th>Số lượng</th>
+        <th>Ngày mượn</th>
+        <th>Ngày trả</th>
+        <th>Trạng thái</th>
+        <th>Thao tác</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let b of borrows">
+        <td>{{ b.userName }}</td>
+        <td>{{ b.deviceName }}</td>
+        <td>{{ b.quantity }}</td>
+        <td>{{ b.borrowDate }}</td>
+        <td>{{ b.returnDate || '-' }}</td>
+        <td>{{ b.status }}</td>
+        <td>
+          <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">
+            Trả thiết bị
+          </button>
+          <span *ngIf="b.status !== 'BORROWING'">-</span>
+        </td>
+      </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</ng-template>
