@@ -6,7 +6,7 @@ import { RequestItem } from '../../shared/models/request.model';
 
 @Injectable({ providedIn: 'root' })
 export class RequestService {
-  private readonly api = 'https://project-jet-five-10.vercel.app/api/requests';
+  private readonly api = 'https://project-1-y5rk.onrender.com/api/requests';
 
   constructor(private http: HttpClient) {}
 

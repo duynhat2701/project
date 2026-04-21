@@ -33,7 +33,7 @@ export interface UserResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'https://project-jet-five-10.vercel.app/api';
+  private readonly baseUrl = 'https://project-1-y5rk.onrender.com/api';
   private readonly tokenKey = 'token';
   private readonly userKey = 'currentUser';
 
