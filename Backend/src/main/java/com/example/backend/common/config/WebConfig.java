@@ -16,7 +16,8 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:4200",
-                                "https://glittery-monstera-85a622.netlify.app"
+                                "https://glittery-monstera-85a622.netlify.app",
+                                "https://project-jet-five-10.vercel.app"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
