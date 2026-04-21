@@ -6,7 +6,7 @@ import { ApiResponse } from '../../shared/models/api-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class BorrowService {
-  private readonly api = 'https://project-jet-five-10.vercel.app';
+  private readonly api = 'https://project-jet-five-10.vercel.app/api/borrows';
 
   constructor(private http: HttpClient) {}
 

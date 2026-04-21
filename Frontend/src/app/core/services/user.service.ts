@@ -6,7 +6,7 @@ import { UserModel } from '../../shared/models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private readonly api = 'https://project-jet-five-10.vercel.app';
+  private readonly api = 'https://project-jet-five-10.vercel.app/api/users';
 
   constructor(private http: HttpClient) {}
 

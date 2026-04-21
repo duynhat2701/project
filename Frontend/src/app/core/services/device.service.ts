@@ -6,7 +6,7 @@ import { Device } from '../../shared/models/device.model';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
-  private readonly api = 'https://project-jet-five-10.vercel.app';
+  private readonly api = 'https://project-jet-five-10.vercel.app/api/devices';
 
   constructor(private http: HttpClient) {}
 
