@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -26,13 +27,15 @@ export class BorrowListComponent implements OnInit {
   private borrowService = inject(BorrowService);
   private requestService = inject(RequestService);
   private deviceService = inject(DeviceService);
+  private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
+
   protected authService = inject(AuthService);
 
   protected devices: Device[] = [];
   protected requests: RequestItem[] = [];
   protected borrows: Borrow[] = [];
 
-  protected loadingDevices = false;
   protected loadingRequests = false;
   protected loadingBorrows = false;
   protected submitting = false;
@@ -46,85 +49,97 @@ export class BorrowListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadDevices();
-    this.loadRequests();
-    this.loadBorrows();
+    this.loadData();
   }
 
-  protected loadDevices(): void {
-    this.loadingDevices = true;
+  protected loadData(): void {
+    this.loadingRequests = true;
+    this.loadingBorrows = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.deviceService
       .getAll()
       .pipe(
         timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
           console.error('Load devices error:', err);
+          this.errorMessage =
+            err?.status === 0
+              ? 'Không kết nối được server.'
+              : err?.status === 504 || err?.name === 'TimeoutError'
+                ? 'Server đang khởi động, vui lòng thử lại sau vài giây.'
+                : err?.error?.message || 'Không tải được danh sách thiết bị.';
           return of([] as Device[]);
         }),
-        finalize(() => (this.loadingDevices = false)),
       )
       .subscribe((res) => {
-        this.devices = res;
+        this.devices = [...res];
+        this.cdr.detectChanges();
       });
-  }
 
-  protected loadRequests(): void {
-    this.loadingRequests = true;
-
-    const request$ = this.authService.isAdmin()
+    const requests$ = this.authService.isAdmin()
       ? this.requestService.getAll()
       : this.requestService.getMy();
 
-    request$
+    requests$
       .pipe(
         timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
           console.error('Load requests error:', err);
           this.errorMessage =
-            err?.name === 'TimeoutError'
-              ? 'Server phản hồi chậm, vui lòng thử lại.'
-              : err?.error?.message || 'Không tải được danh sách yêu cầu.';
+            err?.status === 0
+              ? 'Không kết nối được server.'
+              : err?.status === 504 || err?.name === 'TimeoutError'
+                ? 'Server đang khởi động, vui lòng thử lại sau vài giây.'
+                : err?.error?.message || 'Không tải được danh sách yêu cầu.';
           return of([] as RequestItem[]);
         }),
-        finalize(() => (this.loadingRequests = false)),
+        finalize(() => {
+          this.loadingRequests = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe((res) => {
-        this.requests = res;
+        this.requests = [...res];
+        this.cdr.detectChanges();
       });
-  }
 
-  protected loadBorrows(): void {
-    this.loadingBorrows = true;
-
-    const borrow$ = this.authService.isAdmin()
+    const borrows$ = this.authService.isAdmin()
       ? this.borrowService.getAll()
       : this.borrowService.getMy();
 
-    borrow$
+    borrows$
       .pipe(
         timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
         catchError((err) => {
           console.error('Load borrows error:', err);
           this.errorMessage =
-            err?.name === 'TimeoutError'
-              ? 'Server phản hồi chậm, vui lòng thử lại.'
-              : err?.error?.message || 'Không tải được danh sách mượn / trả.';
+            err?.status === 0
+              ? 'Không kết nối được server.'
+              : err?.status === 504 || err?.name === 'TimeoutError'
+                ? 'Server đang khởi động, vui lòng thử lại sau vài giây.'
+                : err?.error?.message || 'Không tải được danh sách mượn / trả.';
           return of([] as Borrow[]);
         }),
-        finalize(() => (this.loadingBorrows = false)),
+        finalize(() => {
+          this.loadingBorrows = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe((res) => {
-        this.borrows = res;
+        this.borrows = [...res];
+        this.cdr.detectChanges();
       });
   }
 
   protected reloadAll(): void {
     this.errorMessage = '';
     this.successMessage = '';
-    this.loadDevices();
-    this.loadRequests();
-    this.loadBorrows();
+    this.loadData();
   }
 
   protected submitRequest(): void {
@@ -141,21 +156,28 @@ export class BorrowListComponent implements OnInit {
 
     if (!selectedDevice) {
       this.errorMessage = 'Vui lòng chọn thiết bị.';
+      this.cdr.detectChanges();
       return;
     }
 
     if (formValue.quantity > selectedDevice.quantity) {
       this.errorMessage = `Không đủ số lượng. Hiện còn ${selectedDevice.quantity} thiết bị.`;
+      this.cdr.detectChanges();
       return;
     }
 
     this.submitting = true;
+    this.cdr.detectChanges();
 
     this.requestService
       .create(formValue)
       .pipe(
         timeout(15000),
-        finalize(() => (this.submitting = false)),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.submitting = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe({
         next: () => {
@@ -164,14 +186,21 @@ export class BorrowListComponent implements OnInit {
             deviceId: 0,
             quantity: 1,
           });
-          this.reloadAll();
+          this.loadData();
         },
         error: (err) => {
           console.error('Create request error:', err);
           this.errorMessage =
-            err?.name === 'TimeoutError'
-              ? 'Server phản hồi chậm, vui lòng thử lại.'
-              : err?.error?.message || 'Gửi yêu cầu thất bại.';
+            err?.status === 403
+              ? 'Bạn không có quyền gửi yêu cầu.'
+              : err?.status === 401
+                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                : err?.status === 0
+                  ? 'Không kết nối được server.'
+                  : err?.name === 'TimeoutError'
+                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
+                    : err?.error?.message || 'Gửi yêu cầu thất bại.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -180,26 +209,36 @@ export class BorrowListComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
     this.loadingRequests = true;
+    this.cdr.detectChanges();
 
     this.borrowService
       .approve(id)
       .pipe(
         timeout(15000),
-        finalize(() => (this.loadingRequests = false)),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loadingRequests = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe({
         next: () => {
           this.successMessage = 'Duyệt yêu cầu thành công.';
-          this.loadRequests();
-          this.loadBorrows();
-          this.loadDevices();
+          this.loadData();
         },
         error: (err) => {
           console.error('Approve request error:', err);
           this.errorMessage =
-            err?.name === 'TimeoutError'
-              ? 'Server phản hồi chậm, vui lòng thử lại.'
-              : err?.error?.message || 'Duyệt yêu cầu thất bại.';
+            err?.status === 403
+              ? 'Bạn không có quyền duyệt yêu cầu.'
+              : err?.status === 401
+                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                : err?.status === 0
+                  ? 'Không kết nối được server.'
+                  : err?.name === 'TimeoutError'
+                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
+                    : err?.error?.message || 'Duyệt yêu cầu thất bại.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -208,25 +247,36 @@ export class BorrowListComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
     this.loadingBorrows = true;
+    this.cdr.detectChanges();
 
     this.borrowService
       .returnDevice(id)
       .pipe(
         timeout(15000),
-        finalize(() => (this.loadingBorrows = false)),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loadingBorrows = false;
+          this.cdr.detectChanges();
+        }),
       )
       .subscribe({
         next: () => {
           this.successMessage = 'Trả thiết bị thành công.';
-          this.loadBorrows();
-          this.loadDevices();
+          this.loadData();
         },
         error: (err) => {
           console.error('Return device error:', err);
           this.errorMessage =
-            err?.name === 'TimeoutError'
-              ? 'Server phản hồi chậm, vui lòng thử lại.'
-              : err?.error?.message || 'Trả thiết bị thất bại.';
+            err?.status === 403
+              ? 'Bạn không có quyền trả thiết bị.'
+              : err?.status === 401
+                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                : err?.status === 0
+                  ? 'Không kết nối được server.'
+                  : err?.name === 'TimeoutError'
+                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
+                    : err?.error?.message || 'Trả thiết bị thất bại.';
+          this.cdr.detectChanges();
         },
       });
   }
