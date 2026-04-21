@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, of, timeout } from 'rxjs';
 import { BorrowService } from '../../core/services/borrow.service';
 import { DeviceService } from '../../core/services/device.service';
 import { RequestService } from '../../core/services/request.service';
@@ -26,6 +27,9 @@ export class BorrowListComponent implements OnInit {
   private borrowService = inject(BorrowService);
   private requestService = inject(RequestService);
   private deviceService = inject(DeviceService);
+  private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
+
   protected authService = inject(AuthService);
 
   protected devices: Device[] = [];
@@ -42,59 +46,75 @@ export class BorrowListComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadDevices();
-    this.loadPageData();
+    this.loadAllData();
   }
 
-  protected loadDevices(): void {
-    this.deviceService.getAll().subscribe({
-      next: (res) => (this.devices = res),
-      error: (err) => {
-        console.error('Load devices error:', err);
-      },
-    });
-  }
-
-  protected loadPageData(): void {
+  protected loadAllData(): void {
     this.loading = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
 
-    if (this.authService.isAdmin()) {
-      this.requestService.getAll().subscribe({
-        next: (res) => (this.requests = res),
-        error: (err) => console.error('Load requests error:', err),
-      });
+    const devices$ = this.deviceService.getAll().pipe(
+      timeout(15000),
+      catchError((err) => {
+        console.error('Load devices error:', err);
+        return of([] as Device[]);
+      }),
+    );
 
-      this.borrowService
-        .getAll()
-        .pipe(finalize(() => (this.loading = false)))
-        .subscribe({
-          next: (res) => {
-            this.borrows = res;
-          },
-          error: (err) => {
-            console.error('Load borrows error:', err);
-            this.errorMessage = err?.error?.message || 'Không tải được danh sách mượn / trả.';
-          },
-        });
+    const requests$ = (this.authService.isAdmin()
+        ? this.requestService.getAll()
+        : this.requestService.getMy()
+    ).pipe(
+      timeout(15000),
+      catchError((err) => {
+        console.error('Load requests error:', err);
+        return of([] as RequestItem[]);
+      }),
+    );
 
-      return;
-    }
+    const borrows$ = (this.authService.isAdmin()
+        ? this.borrowService.getAll()
+        : this.borrowService.getMy()
+    ).pipe(
+      timeout(15000),
+      catchError((err) => {
+        console.error('Load borrows error:', err);
+        return of([] as Borrow[]);
+      }),
+    );
 
-    this.requestService.getMy().subscribe({
-      next: (res) => (this.requests = res),
-      error: (err) => console.error('Load my requests error:', err),
-    });
-
-    this.borrowService
-      .getMy()
-      .pipe(finalize(() => (this.loading = false)))
+    forkJoin({
+      devices: devices$,
+      requests: requests$,
+      borrows: borrows$,
+    })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
-        next: (res) => {
-          this.borrows = res;
+        next: ({ devices, requests, borrows }) => {
+          this.devices = devices;
+          this.requests = requests;
+          this.borrows = borrows;
+
+          if (!devices.length && !requests.length && !borrows.length) {
+            this.errorMessage = '';
+          }
+
+          this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Load my borrows error:', err);
-          this.errorMessage = err?.error?.message || 'Không tải được phiếu mượn của bạn.';
+          console.error('Load page data error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server đang khởi động hoặc phản hồi chậm. Vui lòng thử lại sau vài giây.'
+              : err?.error?.message || 'Không tải được dữ liệu trang mượn / trả.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -109,10 +129,7 @@ export class BorrowListComponent implements OnInit {
     this.successMessage = '';
 
     const formValue = this.requestForm.getRawValue();
-
-    const selectedDevice = this.devices.find(
-      (d) => d.id === formValue.deviceId
-    );
+    const selectedDevice = this.devices.find((d) => d.id === formValue.deviceId);
 
     if (!selectedDevice) {
       this.errorMessage = 'Vui lòng chọn thiết bị.';
@@ -125,26 +142,34 @@ export class BorrowListComponent implements OnInit {
     }
 
     this.submitting = true;
+    this.cdr.detectChanges();
 
     this.requestService
       .create(formValue)
-      .pipe(finalize(() => (this.submitting = false)))
+      .pipe(
+        timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.submitting = false;
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: () => {
           this.successMessage = 'Gửi yêu cầu thành công.';
-
           this.requestForm.reset({
             deviceId: 0,
             quantity: 1,
           });
-
-          this.loadDevices();
-          this.loadPageData();
+          this.loadAllData();
         },
         error: (err) => {
           console.error('Create request error:', err);
           this.errorMessage =
-            err?.error?.message || 'Gửi yêu cầu thất bại.';
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi quá chậm. Vui lòng thử lại.'
+              : err?.error?.message || 'Gửi yêu cầu thất bại.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -152,36 +177,64 @@ export class BorrowListComponent implements OnInit {
   protected approveRequest(id: number): void {
     this.errorMessage = '';
     this.successMessage = '';
+    this.loading = true;
+    this.cdr.detectChanges();
 
-    this.borrowService.approve(id).subscribe({
-      next: () => {
-        this.successMessage = 'Duyệt yêu cầu thành công.';
-        this.loadDevices();
-        this.loadPageData();
-      },
-      error: (err) => {
-        console.error('Approve request error:', err);
-        this.errorMessage =
-          err?.error?.message || 'Duyệt yêu cầu thất bại.';
-      },
-    });
+    this.borrowService
+      .approve(id)
+      .pipe(
+        timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Duyệt yêu cầu thành công.';
+          this.loadAllData();
+        },
+        error: (err) => {
+          console.error('Approve request error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi quá chậm. Vui lòng thử lại.'
+              : err?.error?.message || 'Duyệt yêu cầu thất bại.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   protected returnDevice(id: number): void {
     this.errorMessage = '';
     this.successMessage = '';
+    this.loading = true;
+    this.cdr.detectChanges();
 
-    this.borrowService.returnDevice(id).subscribe({
-      next: () => {
-        this.successMessage = 'Trả thiết bị thành công.';
-        this.loadDevices();
-        this.loadPageData();
-      },
-      error: (err) => {
-        console.error('Return device error:', err);
-        this.errorMessage =
-          err?.error?.message || 'Trả thiết bị thất bại.';
-      },
-    });
+    this.borrowService
+      .returnDevice(id)
+      .pipe(
+        timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Trả thiết bị thành công.';
+          this.loadAllData();
+        },
+        error: (err) => {
+          console.error('Return device error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi quá chậm. Vui lòng thử lại.'
+              : err?.error?.message || 'Trả thiết bị thất bại.';
+          this.cdr.detectChanges();
+        },
+      });
   }
 }
