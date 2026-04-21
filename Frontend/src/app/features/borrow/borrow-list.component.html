@@ -6,6 +6,10 @@
   {{ successMessage }}
 </div>
 
+<div style="margin-bottom: 12px;">
+  <button nz-button (click)="reloadAll()">Tải lại dữ liệu</button>
+</div>
+
 <ng-container *ngIf="authService.isEmployee(); else adminView">
   <nz-card nzTitle="Tạo yêu cầu mượn" style="margin-bottom: 24px;">
     <form nz-form [formGroup]="requestForm" (ngSubmit)="submitRequest()">
@@ -27,7 +31,7 @@
   </nz-card>
 
   <nz-card nzTitle="Yêu cầu của tôi" style="margin-bottom: 24px;">
-    <nz-table [nzData]="requests" [nzLoading]="loading" nzBordered>
+    <nz-table [nzData]="requests" [nzLoading]="loadingRequests" nzBordered>
       <thead>
       <tr>
         <th>Thiết bị</th>
@@ -46,7 +50,7 @@
   </nz-card>
 
   <nz-card nzTitle="Phiếu mượn của tôi">
-    <nz-table [nzData]="borrows" [nzLoading]="loading" nzBordered>
+    <nz-table [nzData]="borrows" [nzLoading]="loadingBorrows" nzBordered>
       <thead>
       <tr>
         <th>Thiết bị</th>
@@ -72,7 +76,7 @@
 
 <ng-template #adminView>
   <nz-card nzTitle="Danh sách yêu cầu" style="margin-bottom: 24px;">
-    <nz-table [nzData]="requests" [nzLoading]="loading" nzBordered>
+    <nz-table [nzData]="requests" [nzLoading]="loadingRequests" nzBordered>
       <thead>
       <tr>
         <th>Người mượn</th>
@@ -101,7 +105,7 @@
   </nz-card>
 
   <nz-card nzTitle="Danh sách mượn / trả">
-    <nz-table [nzData]="borrows" [nzLoading]="loading" nzBordered>
+    <nz-table [nzData]="borrows" [nzLoading]="loadingBorrows" nzBordered>
       <thead>
       <tr>
         <th>Người mượn</th>

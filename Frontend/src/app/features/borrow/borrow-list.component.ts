@@ -6,7 +6,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzTableModule } from 'ng-zorro-antd/table';
-import { finalize } from 'rxjs';
+import { catchError, finalize, of, timeout } from 'rxjs';
 import { BorrowService } from '../../core/services/borrow.service';
 import { DeviceService } from '../../core/services/device.service';
 import { RequestService } from '../../core/services/request.service';
@@ -31,8 +31,12 @@ export class BorrowListComponent implements OnInit {
   protected devices: Device[] = [];
   protected requests: RequestItem[] = [];
   protected borrows: Borrow[] = [];
-  protected loading = false;
+
+  protected loadingDevices = false;
+  protected loadingRequests = false;
+  protected loadingBorrows = false;
   protected submitting = false;
+
   protected errorMessage = '';
   protected successMessage = '';
 
@@ -43,60 +47,84 @@ export class BorrowListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDevices();
-    this.loadPageData();
+    this.loadRequests();
+    this.loadBorrows();
   }
 
   protected loadDevices(): void {
-    this.deviceService.getAll().subscribe({
-      next: (res) => (this.devices = res),
-      error: (err) => {
-        console.error('Load devices error:', err);
-      },
-    });
+    this.loadingDevices = true;
+
+    this.deviceService
+      .getAll()
+      .pipe(
+        timeout(15000),
+        catchError((err) => {
+          console.error('Load devices error:', err);
+          return of([] as Device[]);
+        }),
+        finalize(() => (this.loadingDevices = false)),
+      )
+      .subscribe((res) => {
+        this.devices = res;
+      });
   }
 
-  protected loadPageData(): void {
-    this.loading = true;
+  protected loadRequests(): void {
+    this.loadingRequests = true;
 
-    if (this.authService.isAdmin()) {
-      this.requestService.getAll().subscribe({
-        next: (res) => (this.requests = res),
-        error: (err) => console.error('Load requests error:', err),
+    const request$ = this.authService.isAdmin()
+      ? this.requestService.getAll()
+      : this.requestService.getMy();
+
+    request$
+      .pipe(
+        timeout(15000),
+        catchError((err) => {
+          console.error('Load requests error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi chậm, vui lòng thử lại.'
+              : err?.error?.message || 'Không tải được danh sách yêu cầu.';
+          return of([] as RequestItem[]);
+        }),
+        finalize(() => (this.loadingRequests = false)),
+      )
+      .subscribe((res) => {
+        this.requests = res;
       });
+  }
 
-      this.borrowService
-        .getAll()
-        .pipe(finalize(() => (this.loading = false)))
-        .subscribe({
-          next: (res) => {
-            this.borrows = res;
-          },
-          error: (err) => {
-            console.error('Load borrows error:', err);
-            this.errorMessage = err?.error?.message || 'Không tải được danh sách mượn / trả.';
-          },
-        });
+  protected loadBorrows(): void {
+    this.loadingBorrows = true;
 
-      return;
-    }
+    const borrow$ = this.authService.isAdmin()
+      ? this.borrowService.getAll()
+      : this.borrowService.getMy();
 
-    this.requestService.getMy().subscribe({
-      next: (res) => (this.requests = res),
-      error: (err) => console.error('Load my requests error:', err),
-    });
-
-    this.borrowService
-      .getMy()
-      .pipe(finalize(() => (this.loading = false)))
-      .subscribe({
-        next: (res) => {
-          this.borrows = res;
-        },
-        error: (err) => {
-          console.error('Load my borrows error:', err);
-          this.errorMessage = err?.error?.message || 'Không tải được phiếu mượn của bạn.';
-        },
+    borrow$
+      .pipe(
+        timeout(15000),
+        catchError((err) => {
+          console.error('Load borrows error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi chậm, vui lòng thử lại.'
+              : err?.error?.message || 'Không tải được danh sách mượn / trả.';
+          return of([] as Borrow[]);
+        }),
+        finalize(() => (this.loadingBorrows = false)),
+      )
+      .subscribe((res) => {
+        this.borrows = res;
       });
+  }
+
+  protected reloadAll(): void {
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.loadDevices();
+    this.loadRequests();
+    this.loadBorrows();
   }
 
   protected submitRequest(): void {
@@ -109,10 +137,7 @@ export class BorrowListComponent implements OnInit {
     this.successMessage = '';
 
     const formValue = this.requestForm.getRawValue();
-
-    const selectedDevice = this.devices.find(
-      (d) => d.id === formValue.deviceId
-    );
+    const selectedDevice = this.devices.find((d) => d.id === formValue.deviceId);
 
     if (!selectedDevice) {
       this.errorMessage = 'Vui lòng chọn thiết bị.';
@@ -128,23 +153,25 @@ export class BorrowListComponent implements OnInit {
 
     this.requestService
       .create(formValue)
-      .pipe(finalize(() => (this.submitting = false)))
+      .pipe(
+        timeout(15000),
+        finalize(() => (this.submitting = false)),
+      )
       .subscribe({
         next: () => {
           this.successMessage = 'Gửi yêu cầu thành công.';
-
           this.requestForm.reset({
             deviceId: 0,
             quantity: 1,
           });
-
-          this.loadDevices();
-          this.loadPageData();
+          this.reloadAll();
         },
         error: (err) => {
           console.error('Create request error:', err);
           this.errorMessage =
-            err?.error?.message || 'Gửi yêu cầu thất bại.';
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi chậm, vui lòng thử lại.'
+              : err?.error?.message || 'Gửi yêu cầu thất bại.';
         },
       });
   }
@@ -152,36 +179,55 @@ export class BorrowListComponent implements OnInit {
   protected approveRequest(id: number): void {
     this.errorMessage = '';
     this.successMessage = '';
+    this.loadingRequests = true;
 
-    this.borrowService.approve(id).subscribe({
-      next: () => {
-        this.successMessage = 'Duyệt yêu cầu thành công.';
-        this.loadDevices();
-        this.loadPageData();
-      },
-      error: (err) => {
-        console.error('Approve request error:', err);
-        this.errorMessage =
-          err?.error?.message || 'Duyệt yêu cầu thất bại.';
-      },
-    });
+    this.borrowService
+      .approve(id)
+      .pipe(
+        timeout(15000),
+        finalize(() => (this.loadingRequests = false)),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Duyệt yêu cầu thành công.';
+          this.loadRequests();
+          this.loadBorrows();
+          this.loadDevices();
+        },
+        error: (err) => {
+          console.error('Approve request error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi chậm, vui lòng thử lại.'
+              : err?.error?.message || 'Duyệt yêu cầu thất bại.';
+        },
+      });
   }
 
   protected returnDevice(id: number): void {
     this.errorMessage = '';
     this.successMessage = '';
+    this.loadingBorrows = true;
 
-    this.borrowService.returnDevice(id).subscribe({
-      next: () => {
-        this.successMessage = 'Trả thiết bị thành công.';
-        this.loadDevices();
-        this.loadPageData();
-      },
-      error: (err) => {
-        console.error('Return device error:', err);
-        this.errorMessage =
-          err?.error?.message || 'Trả thiết bị thất bại.';
-      },
-    });
+    this.borrowService
+      .returnDevice(id)
+      .pipe(
+        timeout(15000),
+        finalize(() => (this.loadingBorrows = false)),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Trả thiết bị thành công.';
+          this.loadBorrows();
+          this.loadDevices();
+        },
+        error: (err) => {
+          console.error('Return device error:', err);
+          this.errorMessage =
+            err?.name === 'TimeoutError'
+              ? 'Server phản hồi chậm, vui lòng thử lại.'
+              : err?.error?.message || 'Trả thiết bị thất bại.';
+        },
+      });
   }
 }
