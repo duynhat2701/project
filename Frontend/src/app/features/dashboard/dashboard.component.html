@@ -1,4 +1,145 @@
-<nz-card nzTitle="Dashboard">
-  <p>Chào mừng bạn đến với hệ thống quản lý thiết bị.</p>
-  <p>Vai trò hiện tại: <strong>{{ authService.getUser()?.role }}</strong></p>
-</nz-card>
+<section class="dashboard">
+  <section class="dashboard-hero">
+    <div class="dashboard-hero-copy">
+      <h2>Dashboard overview</h2>
+      <p>
+        Track device usage, top borrowed equipment, and recent borrowing activity from one place.
+      </p>
+      <div class="dashboard-user-role">
+        Current role:
+        <strong>{{ authService.getUser()?.role }}</strong>
+      </div>
+    </div>
+
+    <div class="dashboard-summary">
+      <article class="summary-card">
+        <span>Products</span>
+        <strong>{{ topProducts.length }}</strong>
+        <p>Devices ranked by how many units users borrowed.</p>
+      </article>
+
+      <article class="summary-card">
+        <span>Borrowed Units</span>
+        <strong>{{ totalBorrowedUnits }}</strong>
+        <p>Total quantity borrowed across ranked devices.</p>
+      </article>
+
+      <article class="summary-card">
+        <span>Orders</span>
+        <strong>{{ authService.isAdmin() ? orders.length : 0 }}</strong>
+        <p>{{ authService.isAdmin() ? 'Visible for admin only.' : 'Hidden for employee accounts.' }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <article class="panel sales-panel">
+      <h3>Product Sales</h3>
+
+      <div class="panel-state" *ngIf="loading">Loading dashboard data...</div>
+      <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
+      <div class="panel-state" *ngIf="!loading && !errorMessage && !salesCategories.length">
+        Chua co du lieu muon thiet bi de hien thi bieu do.
+      </div>
+
+      <div class="sales-chart" *ngIf="!loading && !errorMessage && salesCategories.length" [style.--chart-background]="donutStyle"></div>
+
+      <div class="sales-legend" *ngIf="!loading && !errorMessage && salesCategories.length">
+        <div class="sales-legend-item" *ngFor="let item of salesCategories">
+          <div class="legend-name">
+            <span class="legend-dot" [style.background]="item.color"></span>
+            <span>{{ item.name }}</span>
+          </div>
+          <strong>{{ item.value }} units</strong>
+          <span class="legend-share">{{ item.share }}%</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <h3>Top Selling Products</h3>
+
+      <div class="panel-state" *ngIf="loading">Loading top devices...</div>
+      <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
+      <div class="panel-state" *ngIf="!loading && !errorMessage && !topProducts.length">
+        Chua co thiet bi nao duoc muon.
+      </div>
+
+      <div class="table-wrapper" *ngIf="!loading && !errorMessage && topProducts.length">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Borrowed Qty</th>
+              <th>Available Qty</th>
+              <th>Rating</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of topProducts">
+              <td>
+                <div class="product-cell">
+                  <div class="product-thumb" [style.background]="product.accent"></div>
+                  <div class="product-name">{{ product.name }}</div>
+                </div>
+              </td>
+              <td>{{ product.borrowedQuantity }}</td>
+              <td>{{ product.availableQuantity }}</td>
+              <td>
+                <span class="rating-cell">
+                  <span class="rating-star">&#9733;</span>
+                  <span>{{ getRatingLabel(product.rating) }}</span>
+                </span>
+              </td>
+              <td>
+                <span class="status-pill" [ngClass]="getStatusClass(product.status)">
+                  {{ product.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <article class="panel" *ngIf="authService.isAdmin()">
+    <h3>Orders</h3>
+
+    <div class="panel-state" *ngIf="loading">Loading recent borrows...</div>
+    <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
+    <div class="panel-state" *ngIf="!loading && !errorMessage && !orders.length">
+      Chua co giao dich muon tra nao.
+    </div>
+
+    <div class="table-wrapper" *ngIf="!loading && !errorMessage && orders.length">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Borrow ID</th>
+            <th>User</th>
+            <th>Device</th>
+            <th>Quantity</th>
+            <th>Borrow Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders">
+            <td>{{ order.orderLabel }}</td>
+            <td>{{ order.userName }}</td>
+            <td>{{ order.deviceName }}</td>
+            <td>{{ order.quantity }}</td>
+            <td>{{ order.borrowDate | date: 'MMM d, y' }}</td>
+            <td>
+              <span class="status-pill" [ngClass]="getOrderStatusClass(order.status)">
+                {{ order.status }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
