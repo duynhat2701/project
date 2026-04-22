@@ -14,6 +14,7 @@ import { RequestItem } from '../../shared/models/request.model';
 
 interface HeaderNotificationItem {
   id: string;
+  signature: string;
   title: string;
   detail: string;
   status: string;
@@ -30,6 +31,7 @@ interface HeaderNotificationItem {
 export class HeaderComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly elementRef = inject(ElementRef<HTMLElement>);
+  private readonly seenStorageKey = 'headerSeenNotifications';
 
   @Input() isCollapsed = false;
   @Output() toggleMenu = new EventEmitter<void>();
@@ -38,14 +40,16 @@ export class HeaderComponent implements OnInit {
   protected isNotificationOpen = false;
   protected notificationItems: HeaderNotificationItem[] = [];
   protected hasUnreadNotifications = false;
-  private readonly readNotificationIds = new Set<string>();
+  private readonly readNotificationSignatures = new Set<string>();
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private requestService: RequestService,
     private borrowService: BorrowService,
-  ) {}
+  ) {
+    this.loadSeenNotifications();
+  }
 
   ngOnInit(): void {
     this.watchNotifications();
@@ -133,6 +137,7 @@ export class HeaderComponent implements OnInit {
           const pendingRequests = (items as RequestItem[]).filter((item) => item.status === 'PENDING');
           this.notificationItems = pendingRequests.map((item) => ({
             id: `request-${item.id}`,
+            signature: `admin-request-${item.id}-${item.status}`,
             title: `${item.userName} gui yeu cau muon`,
             detail: `${item.deviceName} x ${item.quantity}`,
             status: 'Cho duyet',
@@ -149,6 +154,7 @@ export class HeaderComponent implements OnInit {
 
         this.notificationItems = approvedBorrows.map((item) => ({
           id: `borrow-${item.id}`,
+          signature: `employee-borrow-${item.id}-${item.status}`,
           title: 'Phieu muon da duoc duyet',
           detail: `${item.deviceName} x ${item.quantity}`,
           status: item.status,
@@ -159,31 +165,64 @@ export class HeaderComponent implements OnInit {
   }
 
   private syncNotificationState(): void {
-    const activeIds = new Set(this.notificationItems.map((item) => item.id));
+    const activeSignatures = new Set(this.notificationItems.map((item) => item.signature));
 
-    for (const id of Array.from(this.readNotificationIds)) {
-      if (!activeIds.has(id)) {
-        this.readNotificationIds.delete(id);
+    for (const signature of Array.from(this.readNotificationSignatures)) {
+      if (!activeSignatures.has(signature)) {
+        this.readNotificationSignatures.delete(signature);
       }
     }
+
+    this.saveSeenNotifications();
 
     if (this.isNotificationOpen) {
       this.markNotificationsAsRead();
       return;
     }
 
-    const unreadItems = this.notificationItems.filter((item) => !this.readNotificationIds.has(item.id));
+    const unreadItems = this.notificationItems.filter(
+      (item) => !this.readNotificationSignatures.has(item.signature),
+    );
     this.notificationCount = unreadItems.length;
     this.hasUnreadNotifications = unreadItems.length > 0;
   }
 
   private markNotificationsAsRead(): void {
     for (const item of this.notificationItems) {
-      this.readNotificationIds.add(item.id);
+      this.readNotificationSignatures.add(item.signature);
     }
 
+    this.saveSeenNotifications();
     this.notificationCount = 0;
     this.hasUnreadNotifications = false;
+  }
+
+  private loadSeenNotifications(): void {
+    try {
+      const rawValue = localStorage.getItem(this.seenStorageKey);
+      if (!rawValue) {
+        return;
+      }
+
+      const values = JSON.parse(rawValue) as string[];
+      for (const value of values) {
+        this.readNotificationSignatures.add(value);
+      }
+    } catch (error) {
+      console.error('Load seen notifications error:', error);
+      this.readNotificationSignatures.clear();
+    }
+  }
+
+  private saveSeenNotifications(): void {
+    try {
+      localStorage.setItem(
+        this.seenStorageKey,
+        JSON.stringify(Array.from(this.readNotificationSignatures)),
+      );
+    } catch (error) {
+      console.error('Save seen notifications error:', error);
+    }
   }
 
   private formatDate(value: string): string {
