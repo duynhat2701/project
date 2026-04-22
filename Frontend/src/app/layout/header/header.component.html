@@ -18,8 +18,16 @@
       <button nz-button nzType="text" class="contact-button" aria-label="Email">
         <span nz-icon nzType="mail"></span>
       </button>
-      <button nz-button nzType="text" class="contact-button contact-button-alert" aria-label="Thong bao">
+      <button
+        nz-button
+        nzType="text"
+        class="contact-button contact-button-alert"
+        [class.contact-button-alert-active]="notificationCount > 0"
+        [attr.aria-label]="notificationLabel"
+        [attr.title]="notificationLabel"
+      >
         <span nz-icon nzType="bell"></span>
+        <span class="contact-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
       </button>
     </div>
 

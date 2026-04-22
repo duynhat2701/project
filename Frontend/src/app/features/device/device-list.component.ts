@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -17,6 +17,7 @@ import { Device } from '../../shared/models/device.model';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     NzButtonModule,
     NzCardModule,
@@ -27,17 +28,20 @@ import { Device } from '../../shared/models/device.model';
   templateUrl: './device-list.component.html',
 })
 export class DeviceListComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private deviceService = inject(DeviceService);
-  private cdr = inject(ChangeDetectorRef);
-  private destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly deviceService = inject(DeviceService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
-  protected authService = inject(AuthService);
+  protected readonly authService = inject(AuthService);
 
   protected devices: Device[] = [];
+  protected filteredDevices: Device[] = [];
   protected loading = false;
   protected submitting = false;
   protected errorMessage = '';
+  protected searchKeyword = '';
+  protected editingDeviceId: number | null = null;
 
   protected form = this.fb.nonNullable.group({
     name: ['', [Validators.required]],
@@ -64,11 +68,11 @@ export class DeviceListComponent implements OnInit {
           console.error('Load devices error:', err);
           this.errorMessage =
             err?.status === 0
-              ? 'Không kết nối được server.'
+              ? 'Khong ket noi duoc server.'
               : err?.status === 504 || err?.name === 'TimeoutError'
-                ? 'Server đang khởi động, vui lòng thử lại sau vài giây.'
-                : err?.error?.message || 'Không tải được danh sách thiết bị.';
-          return of([]);
+                ? 'Server dang khoi dong, vui long thu lai sau it giay.'
+                : err?.error?.message || 'Khong tai duoc danh sach thiet bi.';
+          return of([] as Device[]);
         }),
         finalize(() => {
           this.loading = false;
@@ -77,6 +81,7 @@ export class DeviceListComponent implements OnInit {
       )
       .subscribe((res) => {
         this.devices = [...res];
+        this.applySearch();
         this.cdr.detectChanges();
       });
   }
@@ -91,8 +96,12 @@ export class DeviceListComponent implements OnInit {
     this.errorMessage = '';
     this.cdr.detectChanges();
 
-    this.deviceService
-      .create(this.form.getRawValue())
+    const payload = this.form.getRawValue();
+    const request$ = this.editingDeviceId
+      ? this.deviceService.update(this.editingDeviceId, payload)
+      : this.deviceService.create(payload);
+
+    request$
       .pipe(
         timeout(15000),
         takeUntilDestroyed(this.destroyRef),
@@ -103,33 +112,49 @@ export class DeviceListComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          this.form.reset({
-            name: '',
-            code: '',
-            quantity: 0,
-            status: 'AVAILABLE',
-          });
+          this.resetForm();
           this.loadData();
         },
         error: (err) => {
-          console.error('Create device error:', err);
+          console.error('Save device error:', err);
           this.errorMessage =
             err?.status === 403
-              ? 'Bạn không có quyền thêm thiết bị.'
+              ? 'Ban khong co quyen thao tac voi thiet bi.'
               : err?.status === 401
-                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
+                ? 'Phien dang nhap het han. Vui long dang nhap lai.'
                 : err?.status === 0
-                  ? 'Không kết nối được server.'
+                  ? 'Khong ket noi duoc server.'
                   : err?.name === 'TimeoutError'
-                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
-                    : err?.error?.message || 'Thêm thiết bị thất bại.';
+                    ? 'Server phan hoi qua cham, vui long thu lai.'
+                    : err?.error?.message || 'Luu thiet bi that bai.';
           this.cdr.detectChanges();
         },
       });
   }
 
+  protected onSearchChange(keyword: string): void {
+    this.searchKeyword = keyword;
+    this.applySearch();
+  }
+
+  protected startEdit(device: Device): void {
+    this.editingDeviceId = device.id;
+    this.form.reset({
+      name: device.name,
+      code: device.code,
+      quantity: device.quantity,
+      status: device.status,
+    });
+    this.cdr.detectChanges();
+  }
+
+  protected cancelEdit(): void {
+    this.resetForm();
+    this.cdr.detectChanges();
+  }
+
   protected deleteDevice(id: number): void {
-    if (!confirm('Bạn có chắc muốn xóa thiết bị này?')) {
+    if (!confirm('Ban co chac muon xoa thiet bi nay?')) {
       return;
     }
 
@@ -151,9 +176,34 @@ export class DeviceListComponent implements OnInit {
         next: () => this.loadData(),
         error: (err) => {
           console.error('Delete device error:', err);
-          this.errorMessage = err?.error?.message || 'Xóa thiết bị thất bại.';
+          this.errorMessage = err?.error?.message || 'Xoa thiet bi that bai.';
           this.cdr.detectChanges();
         },
       });
+  }
+
+  private applySearch(): void {
+    const keyword = this.searchKeyword.trim().toLowerCase();
+
+    if (!keyword) {
+      this.filteredDevices = [...this.devices];
+      return;
+    }
+
+    this.filteredDevices = this.devices.filter((device) =>
+      [device.name, device.code, device.status].some((value) =>
+        value.toLowerCase().includes(keyword),
+      ),
+    );
+  }
+
+  private resetForm(): void {
+    this.editingDeviceId = null;
+    this.form.reset({
+      name: '',
+      code: '',
+      quantity: 0,
+      status: 'AVAILABLE',
+    });
   }
 }

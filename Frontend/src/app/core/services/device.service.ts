@@ -22,6 +22,12 @@ export class DeviceService {
     );
   }
 
+  update(id: number, data: Partial<Device>): Observable<Device> {
+    return this.http.put<ApiResponse<Device>>(`${this.api}/${id}`, data).pipe(
+      map((response) => response.data),
+    );
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<ApiResponse<void>>(`${this.api}/${id}`).pipe(
       map(() => void 0),
