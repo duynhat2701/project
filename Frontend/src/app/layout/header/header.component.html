@@ -25,10 +25,33 @@
         [class.contact-button-alert-active]="notificationCount > 0"
         [attr.aria-label]="notificationLabel"
         [attr.title]="notificationLabel"
+        (click)="toggleNotifications($event)"
       >
         <span nz-icon nzType="bell"></span>
         <span class="contact-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
       </button>
+
+      <div class="notification-panel" *ngIf="isNotificationOpen">
+        <div class="notification-panel-header">
+          <strong>Thong bao</strong>
+          <span>{{ notificationCount }} moi</span>
+        </div>
+
+        <div class="notification-empty" *ngIf="!notificationItems.length">
+          Khong co thong bao nao de hien thi.
+        </div>
+
+        <div class="notification-list" *ngIf="notificationItems.length">
+          <div class="notification-item" *ngFor="let item of notificationItems">
+            <div class="notification-item-head">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.timeLabel }}</span>
+            </div>
+            <p>{{ item.detail }}</p>
+            <small>{{ item.status }}</small>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="account-card" *ngIf="currentUser as user">
@@ -37,7 +60,7 @@
         <strong>{{ user.name }}</strong>
         <span>{{ user.email }}</span>
       </div>
-      <button nz-button nzType="primary" class="logout-button" (click)="logout()">Đăng xuất</button>
+      <button nz-button nzType="primary" class="logout-button" (click)="logout()">Dang xuat</button>
     </div>
   </div>
 </nz-header>

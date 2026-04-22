@@ -55,6 +55,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
 }
 
 .contact-button {
@@ -101,6 +102,80 @@
   font-weight: 700;
   line-height: 1;
   box-shadow: 0 0 0 2px #ffffff;
+}
+
+.notification-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 320px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 14px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.14);
+  z-index: 30;
+}
+
+.notification-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  color: #0f172a;
+}
+
+.notification-panel-header span {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.notification-empty {
+  padding: 18px 8px;
+  color: #64748b;
+  text-align: center;
+}
+
+.notification-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.notification-item {
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fbff;
+}
+
+.notification-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.notification-item-head strong {
+  color: #0f172a;
+  font-size: 0.92rem;
+}
+
+.notification-item-head span {
+  color: #94a3b8;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.notification-item p {
+  margin: 8px 0 6px;
+  color: #334155;
+  font-size: 0.88rem;
+}
+
+.notification-item small {
+  color: #2563eb;
+  font-weight: 700;
 }
 
 .account-card {
@@ -167,6 +242,12 @@
   .header-right {
     padding-top: 0;
     justify-content: space-between;
+  }
+
+  .notification-panel {
+    right: auto;
+    left: 0;
+    width: min(320px, calc(100vw - 32px));
   }
 
   .account-card {

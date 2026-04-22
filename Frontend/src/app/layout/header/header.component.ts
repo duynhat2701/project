@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, DestroyRef, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, interval, of, startWith, switchMap } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -9,6 +9,16 @@ import { Router } from '@angular/router';
 import { AuthService, LoginResponse } from '../../core/services/auth.service';
 import { BorrowService } from '../../core/services/borrow.service';
 import { RequestService } from '../../core/services/request.service';
+import { Borrow } from '../../shared/models/borrow.model';
+import { RequestItem } from '../../shared/models/request.model';
+
+interface HeaderNotificationItem {
+  id: string;
+  title: string;
+  detail: string;
+  status: string;
+  timeLabel: string;
+}
 
 @Component({
   selector: 'app-header',
@@ -19,11 +29,14 @@ import { RequestService } from '../../core/services/request.service';
 })
 export class HeaderComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
 
   @Input() isCollapsed = false;
   @Output() toggleMenu = new EventEmitter<void>();
 
   protected notificationCount = 0;
+  protected isNotificationOpen = false;
+  protected notificationItems: HeaderNotificationItem[] = [];
 
   constructor(
     private router: Router,
@@ -71,6 +84,19 @@ export class HeaderComponent implements OnInit {
       : 'Chua co phieu muon nao duoc duyet';
   }
 
+  protected toggleNotifications(event: MouseEvent): void {
+    event.stopPropagation();
+    this.isNotificationOpen = !this.isNotificationOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node | null;
+    if (target && !this.elementRef.nativeElement.contains(target)) {
+      this.isNotificationOpen = false;
+    }
+  }
+
   logout(): void {
     this.authService.logout();
     void this.router.navigate(['/login']);
@@ -99,14 +125,41 @@ export class HeaderComponent implements OnInit {
       )
       .subscribe((items) => {
         if (this.authService.isAdmin()) {
-          this.notificationCount = items.filter((item) => item.status === 'PENDING').length;
+          const pendingRequests = (items as RequestItem[]).filter((item) => item.status === 'PENDING');
+          this.notificationCount = pendingRequests.length;
+          this.notificationItems = pendingRequests.map((item) => ({
+            id: `request-${item.id}`,
+            title: `${item.userName} gui yeu cau muon`,
+            detail: `${item.deviceName} x ${item.quantity}`,
+            status: 'Cho duyet',
+            timeLabel: `Ma yeu cau #${item.id}`,
+          }));
           return;
         }
 
-        this.notificationCount = items.filter((item) => {
+        const approvedBorrows = (items as Borrow[]).filter((item) => {
           const status = item.status?.toUpperCase();
           return status === 'BORROWING' || status === 'APPROVED';
-        }).length;
+        });
+
+        this.notificationCount = approvedBorrows.length;
+        this.notificationItems = approvedBorrows.map((item) => ({
+          id: `borrow-${item.id}`,
+          title: 'Phieu muon da duoc duyet',
+          detail: `${item.deviceName} x ${item.quantity}`,
+          status: item.status,
+          timeLabel: this.formatDate(item.borrowDate),
+        }));
       });
+  }
+
+  private formatDate(value: string): string {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return date.toLocaleDateString('vi-VN');
   }
 }
