@@ -11,6 +11,13 @@
   </div>
 
   <div class="header-right">
-    <button nz-button nzType="primary" (click)="logout()">Đăng xuất</button>
+    <div class="account-card" *ngIf="currentUser as user">
+      <div class="account-avatar">{{ userInitials }}</div>
+      <div class="account-meta">
+        <strong>{{ user.name }}</strong>
+        <span>{{ user.email }}</span>
+      </div>
+      <button nz-button nzType="default" class="logout-button" (click)="logout()">Đăng xuất</button>
+    </div>
   </div>
 </nz-header>
