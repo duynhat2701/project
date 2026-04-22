@@ -5,8 +5,7 @@ import { catchError, interval, of, startWith, switchMap } from 'rxjs';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
-import { Router } from '@angular/router';
-import { AuthService, LoginResponse } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { BorrowService } from '../../core/services/borrow.service';
 import { RequestService } from '../../core/services/request.service';
 import { Borrow } from '../../shared/models/borrow.model';
@@ -43,7 +42,6 @@ export class HeaderComponent implements OnInit {
   private readonly readNotificationSignatures = new Set<string>();
 
   constructor(
-    private router: Router,
     private authService: AuthService,
     private requestService: RequestService,
     private borrowService: BorrowService,
@@ -57,25 +55,6 @@ export class HeaderComponent implements OnInit {
 
   protected onToggleMenu(): void {
     this.toggleMenu.emit();
-  }
-
-  protected get currentUser(): LoginResponse | null {
-    return this.authService.getUser();
-  }
-
-  protected get userInitials(): string {
-    const name = this.currentUser?.name?.trim();
-
-    if (!name) {
-      return 'U';
-    }
-
-    return name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part.charAt(0).toUpperCase())
-      .join('');
   }
 
   protected get notificationLabel(): string {
@@ -104,11 +83,6 @@ export class HeaderComponent implements OnInit {
     if (target && !this.elementRef.nativeElement.contains(target)) {
       this.isNotificationOpen = false;
     }
-  }
-
-  logout(): void {
-    this.authService.logout();
-    void this.router.navigate(['/login']);
   }
 
   private watchNotifications(): void {

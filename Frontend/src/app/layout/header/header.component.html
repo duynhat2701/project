@@ -53,14 +53,5 @@
         </div>
       </div>
     </div>
-
-    <div class="account-card" *ngIf="currentUser as user">
-      <div class="account-avatar">{{ userInitials }}</div>
-      <div class="account-meta">
-        <strong>{{ user.name }}</strong>
-        <span>{{ user.email }}</span>
-      </div>
-      <button nz-button nzType="primary" class="logout-button" (click)="logout()">Dang xuat</button>
-    </div>
   </div>
 </nz-header>
