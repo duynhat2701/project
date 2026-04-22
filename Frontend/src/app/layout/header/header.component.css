@@ -45,8 +45,43 @@
 .header-right {
   padding-top: 6px;
   display: flex;
+  align-items: center;
+  gap: 12px;
   justify-content: flex-end;
   flex: 1;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-button {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: inline-grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  color: #334155;
+}
+
+.contact-button-alert {
+  position: relative;
+}
+
+.contact-button-alert::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px #ffffff;
 }
 
 .account-card {
@@ -112,10 +147,11 @@
 
   .header-right {
     padding-top: 0;
+    justify-content: space-between;
   }
 
   .account-card {
-    width: 100%;
+    width: calc(100% - 156px);
   }
 
   .account-meta {
