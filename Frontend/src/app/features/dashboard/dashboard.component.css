@@ -241,19 +241,19 @@
   font-weight: 700;
 }
 
-.status-pill-in-stock,
+.status-pill-con-hang,
 .status-pill-shipped {
   background: #ccfbf1;
   color: #0f766e;
 }
 
-.status-pill-low-stock,
+.status-pill-sap-het,
 .status-pill-pending {
   background: #fef3c7;
   color: #b45309;
 }
 
-.status-pill-out-of-stock,
+.status-pill-het-hang,
 .status-pill-cancel {
   background: #fee2e2;
   color: #dc2626;

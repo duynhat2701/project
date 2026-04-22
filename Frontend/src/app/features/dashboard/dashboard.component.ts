@@ -15,7 +15,7 @@ interface ProductStat {
   borrowedQuantity: number;
   borrowCount: number;
   rating: number;
-  status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+  status: 'Con hang' | 'Sap het' | 'Het hang';
   accent: string;
 }
 
@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit {
     this.loadDashboard();
   }
 
-  getStatusClass(status: ProductStat['status'] | OrderStat['status']): string {
+  getStatusClass(status: ProductStat['status']): string {
     return `status-pill-${status.toLowerCase().replace(/\s+/g, '-')}`;
   }
 
@@ -214,16 +214,38 @@ export class DashboardComponent implements OnInit {
       }));
   }
 
+  getOrderStatusLabel(status: string): string {
+    const normalized = status.toUpperCase();
+
+    if (normalized === 'BORROWING') {
+      return 'Dang muon';
+    }
+
+    if (normalized === 'RETURNED') {
+      return 'Da tra';
+    }
+
+    if (normalized === 'PENDING') {
+      return 'Cho duyet';
+    }
+
+    if (normalized === 'CANCELLED' || normalized === 'CANCELED') {
+      return 'Da huy';
+    }
+
+    return status;
+  }
+
   private mapInventoryStatus(quantity: number): ProductStat['status'] {
     if (quantity <= 0) {
-      return 'Out of Stock';
+      return 'Het hang';
     }
 
     if (quantity <= 2) {
-      return 'Low Stock';
+      return 'Sap het';
     }
 
-    return 'In Stock';
+    return 'Con hang';
   }
 
   private buildAccent(index: number): string {

@@ -1,42 +1,42 @@
 <section class="dashboard">
   <section class="dashboard-hero">
     <div class="dashboard-hero-copy">
-      <h2>Dashboard overview</h2>
+      <h2>Tổng quan dashboard</h2>
       <p>
-        Track device usage, top borrowed equipment, and recent borrowing activity from one place.
+        Theo dõi tình trạng sử dụng thiết bị, thiết bị được mượn nhiều nhất và hoạt động mượn gần đây tại một nơi.
       </p>
       <div class="dashboard-user-role">
-        Current role:
+        Vai trò hiện tại:
         <strong>{{ authService.getUser()?.role }}</strong>
       </div>
     </div>
 
     <div class="dashboard-summary">
       <article class="summary-card">
-        <span>Products</span>
+        <span>Thiết bị</span>
         <strong>{{ topProducts.length }}</strong>
-        <p>Devices ranked by how many units users borrowed.</p>
+        <p>Thiết bị được xếp hạng theo số lượng người dùng đã mượn.</p>
       </article>
 
       <article class="summary-card">
-        <span>Borrowed Units</span>
+        <span>Lượt mượn</span>
         <strong>{{ totalBorrowedUnits }}</strong>
-        <p>Total quantity borrowed across ranked devices.</p>
+        <p>Tổng số lượng đã được mượn trong nhóm thiết bị xếp hạng.</p>
       </article>
 
       <article class="summary-card">
-        <span>Orders</span>
+        <span>Phiếu mượn</span>
         <strong>{{ authService.isAdmin() ? orders.length : 0 }}</strong>
-        <p>{{ authService.isAdmin() ? 'Visible for admin only.' : 'Hidden for employee accounts.' }}</p>
+        <p>{{ authService.isAdmin() ? 'Chi hien thi cho tai khoan admin.' : 'An doi voi tai khoan nhan vien.' }}</p>
       </article>
     </div>
   </section>
 
   <section class="dashboard-grid">
     <article class="panel sales-panel">
-      <h3>Product Sales</h3>
+      <h3>Tỷ lệ mượn thiết bị</h3>
 
-      <div class="panel-state" *ngIf="loading">Loading dashboard data...</div>
+      <div class="panel-state" *ngIf="loading">Dang tai du lieu dashboard...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
       <div class="panel-state" *ngIf="!loading && !errorMessage && !salesCategories.length">
         Chua co du lieu muon thiet bi de hien thi bieu do.
@@ -50,16 +50,16 @@
             <span class="legend-dot" [style.background]="item.color"></span>
             <span>{{ item.name }}</span>
           </div>
-          <strong>{{ item.value }} units</strong>
+          <strong>{{ item.value }} lượt</strong>
           <span class="legend-share">{{ item.share }}%</span>
         </div>
       </div>
     </article>
 
     <article class="panel">
-      <h3>Top Selling Products</h3>
+      <h3>Thiết bị được mượn nhiều nhất</h3>
 
-      <div class="panel-state" *ngIf="loading">Loading top devices...</div>
+      <div class="panel-state" *ngIf="loading">Dang tai danh sach thiet bi...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
       <div class="panel-state" *ngIf="!loading && !errorMessage && !topProducts.length">
         Chua co thiet bi nao duoc muon.
@@ -69,11 +69,11 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>Product</th>
-              <th>Borrowed Qty</th>
-              <th>Available Qty</th>
-              <th>Rating</th>
-              <th>Status</th>
+              <th>Thiết bị</th>
+              <th>Số lượng đã mượn</th>
+              <th>Số lượng còn lại</th>
+              <th>Đánh giá</th>
+              <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
@@ -105,26 +105,26 @@
   </section>
 
   <article class="panel" *ngIf="authService.isAdmin()">
-    <h3>Orders</h3>
+    <h3>Phiếu mượn gần đây</h3>
 
-    <div class="panel-state" *ngIf="loading">Loading recent borrows...</div>
+    <div class="panel-state" *ngIf="loading">Dang tai danh sach muon gan day...</div>
     <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
     <div class="panel-state" *ngIf="!loading && !errorMessage && !orders.length">
       Chua co giao dich muon tra nao.
     </div>
 
     <div class="table-wrapper" *ngIf="!loading && !errorMessage && orders.length">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Borrow ID</th>
-            <th>User</th>
-            <th>Device</th>
-            <th>Quantity</th>
-            <th>Borrow Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Mã phiếu</th>
+              <th>Người mượn</th>
+              <th>Thiết bị</th>
+              <th>Số lượng</th>
+              <th>Ngày mượn</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
         <tbody>
           <tr *ngFor="let order of orders">
             <td>{{ order.orderLabel }}</td>
@@ -134,7 +134,7 @@
             <td>{{ order.borrowDate | date: 'MMM d, y' }}</td>
             <td>
               <span class="status-pill" [ngClass]="getOrderStatusClass(order.status)">
-                {{ order.status }}
+                {{ getOrderStatusLabel(order.status) }}
               </span>
             </td>
           </tr>
