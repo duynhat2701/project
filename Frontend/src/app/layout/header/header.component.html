@@ -22,13 +22,13 @@
         nz-button
         nzType="text"
         class="contact-button contact-button-alert"
-        [class.contact-button-alert-active]="notificationCount > 0"
+        [class.contact-button-alert-active]="hasUnreadNotifications"
         [attr.aria-label]="notificationLabel"
         [attr.title]="notificationLabel"
         (click)="toggleNotifications($event)"
       >
         <span nz-icon nzType="bell"></span>
-        <span class="contact-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+        <span class="contact-badge" *ngIf="hasUnreadNotifications">{{ notificationCount }}</span>
       </button>
 
       <div class="notification-panel" *ngIf="isNotificationOpen">

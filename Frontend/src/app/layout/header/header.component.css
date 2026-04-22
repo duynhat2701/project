@@ -61,6 +61,8 @@
 .contact-button {
   width: 42px;
   height: 42px;
+  min-width: 42px;
+  padding: 0;
   border-radius: 14px;
   display: inline-grid;
   place-items: center;
@@ -71,6 +73,7 @@
 
 .contact-button-alert {
   position: relative;
+  overflow: visible;
 }
 
 .contact-button-alert-active::after {

@@ -37,6 +37,7 @@ export class HeaderComponent implements OnInit {
   protected notificationCount = 0;
   protected isNotificationOpen = false;
   protected notificationItems: HeaderNotificationItem[] = [];
+  protected hasUnreadNotifications = false;
 
   constructor(
     private router: Router,
@@ -87,6 +88,9 @@ export class HeaderComponent implements OnInit {
   protected toggleNotifications(event: MouseEvent): void {
     event.stopPropagation();
     this.isNotificationOpen = !this.isNotificationOpen;
+    if (this.isNotificationOpen) {
+      this.hasUnreadNotifications = false;
+    }
   }
 
   @HostListener('document:click', ['$event'])
@@ -127,6 +131,7 @@ export class HeaderComponent implements OnInit {
         if (this.authService.isAdmin()) {
           const pendingRequests = (items as RequestItem[]).filter((item) => item.status === 'PENDING');
           this.notificationCount = pendingRequests.length;
+          this.hasUnreadNotifications = pendingRequests.length > 0 && !this.isNotificationOpen;
           this.notificationItems = pendingRequests.map((item) => ({
             id: `request-${item.id}`,
             title: `${item.userName} gui yeu cau muon`,
@@ -143,6 +148,7 @@ export class HeaderComponent implements OnInit {
         });
 
         this.notificationCount = approvedBorrows.length;
+        this.hasUnreadNotifications = approvedBorrows.length > 0 && !this.isNotificationOpen;
         this.notificationItems = approvedBorrows.map((item) => ({
           id: `borrow-${item.id}`,
           title: 'Phieu muon da duoc duyet',
