@@ -38,6 +38,7 @@ export class HeaderComponent implements OnInit {
   protected isNotificationOpen = false;
   protected notificationItems: HeaderNotificationItem[] = [];
   protected hasUnreadNotifications = false;
+  private readonly readNotificationIds = new Set<string>();
 
   constructor(
     private router: Router,
@@ -89,7 +90,7 @@ export class HeaderComponent implements OnInit {
     event.stopPropagation();
     this.isNotificationOpen = !this.isNotificationOpen;
     if (this.isNotificationOpen) {
-      this.hasUnreadNotifications = false;
+      this.markNotificationsAsRead();
     }
   }
 
@@ -130,8 +131,6 @@ export class HeaderComponent implements OnInit {
       .subscribe((items) => {
         if (this.authService.isAdmin()) {
           const pendingRequests = (items as RequestItem[]).filter((item) => item.status === 'PENDING');
-          this.notificationCount = pendingRequests.length;
-          this.hasUnreadNotifications = pendingRequests.length > 0 && !this.isNotificationOpen;
           this.notificationItems = pendingRequests.map((item) => ({
             id: `request-${item.id}`,
             title: `${item.userName} gui yeu cau muon`,
@@ -139,6 +138,7 @@ export class HeaderComponent implements OnInit {
             status: 'Cho duyet',
             timeLabel: `Ma yeu cau #${item.id}`,
           }));
+          this.syncNotificationState();
           return;
         }
 
@@ -147,8 +147,6 @@ export class HeaderComponent implements OnInit {
           return status === 'BORROWING' || status === 'APPROVED';
         });
 
-        this.notificationCount = approvedBorrows.length;
-        this.hasUnreadNotifications = approvedBorrows.length > 0 && !this.isNotificationOpen;
         this.notificationItems = approvedBorrows.map((item) => ({
           id: `borrow-${item.id}`,
           title: 'Phieu muon da duoc duyet',
@@ -156,7 +154,36 @@ export class HeaderComponent implements OnInit {
           status: item.status,
           timeLabel: this.formatDate(item.borrowDate),
         }));
+        this.syncNotificationState();
       });
+  }
+
+  private syncNotificationState(): void {
+    const activeIds = new Set(this.notificationItems.map((item) => item.id));
+
+    for (const id of Array.from(this.readNotificationIds)) {
+      if (!activeIds.has(id)) {
+        this.readNotificationIds.delete(id);
+      }
+    }
+
+    if (this.isNotificationOpen) {
+      this.markNotificationsAsRead();
+      return;
+    }
+
+    const unreadItems = this.notificationItems.filter((item) => !this.readNotificationIds.has(item.id));
+    this.notificationCount = unreadItems.length;
+    this.hasUnreadNotifications = unreadItems.length > 0;
+  }
+
+  private markNotificationsAsRead(): void {
+    for (const item of this.notificationItems) {
+      this.readNotificationIds.add(item.id);
+    }
+
+    this.notificationCount = 0;
+    this.hasUnreadNotifications = false;
   }
 
   private formatDate(value: string): string {
