@@ -1,68 +1,88 @@
-<nz-card nzTitle="Danh sách thiết bị">
-  <div *ngIf="errorMessage" style="margin-bottom: 16px; color: #d4380d; font-weight: 500;">
+<section class="page-shell device-page">
+  <div *ngIf="errorMessage" class="feedback-banner feedback-banner-error">
     {{ errorMessage }}
   </div>
 
-  <div style="margin-bottom: 16px;">
-    <input
-      nz-input
-      [ngModel]="searchKeyword"
-      (ngModelChange)="onSearchChange($event)"
-      placeholder="Tìm theo tên, mã hoặc trạng thái"
-    />
-  </div>
+  <nz-card class="section-card device-table-card" [nzBordered]="false">
+    <div class="toolbar-row">
+      <div class="device-card-head">
+        <h2 class="page-title">Danh sách thiết bị</h2>
+        <p class="page-subtitle">Theo dõi tồn kho, cập nhật trạng thái và quản lý mã thiết bị.</p>
+      </div>
 
-  <ng-container *ngIf="authService.isAdmin()">
-    <form nz-form [formGroup]="form" (ngSubmit)="submit()" style="margin-bottom: 24px;">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-        <input nz-input formControlName="name" placeholder="Tên thiết bị" />
-        <input nz-input formControlName="code" placeholder="Mã thiết bị" />
-        <input nz-input type="number" formControlName="quantity" placeholder="Số lượng" />
-        <select formControlName="status" style="height:32px;padding:4px 8px;">
+      <div class="toolbar-search">
+        <input
+          nz-input
+          [ngModel]="searchKeyword"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Tìm theo tên, mã hoặc trạng thái"
+        />
+      </div>
+    </div>
+  </nz-card>
+
+  <nz-card *ngIf="authService.isAdmin()" class="section-card device-form-card" [nzBordered]="false">
+    <div class="device-card-head">
+      <h3 class="page-title">{{ editingDeviceId ? 'Cập nhật thiết bị' : 'Thêm thiết bị mới' }}</h3>
+      <p class="page-subtitle">Điền thông tin cơ bản và chọn trạng thái phù hợp trước khi lưu.</p>
+    </div>
+
+    <form nz-form [formGroup]="form" (ngSubmit)="submit()" class="surface-form device-form">
+      <div class="surface-form-grid">
+        <input nz-input class="surface-field" formControlName="name" placeholder="Tên thiết bị" />
+        <input nz-input class="surface-field" formControlName="code" placeholder="Mã thiết bị" />
+        <input nz-input class="surface-field" type="number" formControlName="quantity" placeholder="Số lượng" />
+        <select class="surface-select" formControlName="status">
           <option *ngFor="let option of statusOptions" [ngValue]="option.value">{{ option.label }}</option>
         </select>
       </div>
 
-      <div style="margin-top:12px; display:flex; gap:12px;">
+      <div class="surface-actions">
         <button nz-button nzType="primary" [nzLoading]="submitting">
-          {{ editingDeviceId ? 'Cập nhật thiết bị' : 'Thêm thiết bị' }}
+          {{ editingDeviceId ? 'Lưu thay đổi' : 'Thêm thiết bị' }}
         </button>
-
-        <button
-          *ngIf="editingDeviceId"
-          type="button"
-          nz-button
-          nzType="default"
-          (click)="cancelEdit()"
-        >
+        <button *ngIf="editingDeviceId" type="button" nz-button nzType="default" (click)="cancelEdit()">
           Hủy
         </button>
       </div>
     </form>
-  </ng-container>
+  </nz-card>
 
-  <nz-table [nzData]="filteredDevices" [nzLoading]="loading" nzBordered>
-    <thead>
-      <tr>
-        <th>Tên</th>
-        <th>Mã</th>
-        <th>Số lượng</th>
-        <th>Trạng thái</th>
-        <th *ngIf="authService.isAdmin()">Thao tác</th>
-      </tr>
-    </thead>
+  <nz-card class="section-card device-table-card" [nzBordered]="false">
+    <nz-table class="table-primary" [nzData]="filteredDevices" [nzLoading]="loading" [nzBordered]="false">
+      <thead>
+        <tr>
+          <th>Thiết bị</th>
+          <th>Mã</th>
+          <th>Số lượng</th>
+          <th>Trạng thái</th>
+          <th *ngIf="authService.isAdmin()">Thao tác</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      <tr *ngFor="let d of filteredDevices">
-        <td>{{ d.name }}</td>
-        <td>{{ d.code }}</td>
-        <td>{{ d.quantity }}</td>
-        <td>{{ getDeviceStatusLabel(d.status) }}</td>
-        <td *ngIf="authService.isAdmin()" style="display:flex; gap:8px;">
-          <button nz-button (click)="startEdit(d)">Cập nhật</button>
-          <button nz-button nzDanger (click)="deleteDevice(d.id)">Xóa</button>
-        </td>
-      </tr>
-    </tbody>
-  </nz-table>
-</nz-card>
+      <tbody>
+        <tr *ngFor="let d of filteredDevices">
+          <td>
+            <div class="device-name">
+              <strong>{{ d.name }}</strong>
+              <span class="device-meta">Mã nội bộ: {{ d.code }}</span>
+            </div>
+          </td>
+          <td><span class="device-meta">{{ d.code }}</span></td>
+          <td><span class="device-quantity">{{ d.quantity }}</span></td>
+          <td>
+            <span [class]="getStatusClass(d.status)">
+              {{ getDeviceStatusLabel(d.status) }}
+            </span>
+          </td>
+          <td *ngIf="authService.isAdmin()">
+            <div class="table-actions">
+              <button nz-button nzType="default" (click)="startEdit(d)">Cập nhật</button>
+              <button nz-button nzDanger (click)="deleteDevice(d.id)">Xóa</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</section>

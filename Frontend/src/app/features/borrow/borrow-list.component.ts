@@ -22,6 +22,7 @@ import { getBorrowStatusLabel } from '../../shared/utils/status-label.util';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzTableModule],
   templateUrl: './borrow-list.component.html',
+  styleUrl: './borrow-list.component.css',
 })
 export class BorrowListComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -281,5 +282,27 @@ export class BorrowListComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  protected getStatusClass(status: string): string {
+    const normalized = status.toUpperCase();
+
+    if (normalized === 'PENDING') {
+      return 'status-chip status-chip-warning';
+    }
+
+    if (normalized === 'APPROVED' || normalized === 'RETURNED') {
+      return 'status-chip status-chip-success';
+    }
+
+    if (normalized === 'BORROWING') {
+      return 'status-chip status-chip-info';
+    }
+
+    if (normalized === 'REJECTED' || normalized === 'CANCELLED' || normalized === 'CANCELED') {
+      return 'status-chip status-chip-danger';
+    }
+
+    return 'status-chip';
   }
 }

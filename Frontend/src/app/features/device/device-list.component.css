@@ -1,0 +1,41 @@
+.device-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.device-form-card,
+.device-table-card {
+  padding: 0;
+}
+
+.device-card-head {
+  padding: 4px 0 0;
+}
+
+.device-card-head p {
+  margin: 6px 0 0;
+}
+
+.device-form {
+  margin-top: 18px;
+}
+
+.device-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-name strong {
+  font-size: 0.96rem;
+}
+
+.device-meta {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.device-quantity {
+  font-weight: 700;
+}

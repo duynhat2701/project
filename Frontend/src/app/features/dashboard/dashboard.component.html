@@ -1,7 +1,8 @@
 <section class="dashboard">
-  <section class="dashboard-hero">
+  <section class="dashboard-hero section-card">
     <div class="dashboard-hero-copy">
-      <h2>Tổng quan hệ thống</h2>
+      <p class="dashboard-kicker">Tổng quan</p>
+      <h2>Hệ thống quản lý thiết bị</h2>
       <p>
         Theo dõi tình trạng sử dụng thiết bị, thiết bị được mượn nhiều nhất và hoạt động mượn gần đây tại một nơi.
       </p>
@@ -21,11 +22,11 @@
       <article class="summary-card">
         <span>Lượt mượn</span>
         <strong>{{ totalBorrowedUnits }}</strong>
-        <p>Tổng số lượng đã được mượn trong nhóm thiết bị xếp hạng.</p>
+        <p>Tổng số lượng đã được mượn trong nhóm thiết bị đang được theo dõi.</p>
       </article>
 
       <article class="summary-card">
-        <span>Phiếu mượn</span>
+        <span>Phiếu gần đây</span>
         <strong>{{ authService.isAdmin() ? orders.length : 0 }}</strong>
         <p>{{ authService.isAdmin() ? 'Chỉ hiển thị cho tài khoản quản trị viên.' : 'Ẩn đối với tài khoản nhân viên.' }}</p>
       </article>
@@ -33,8 +34,11 @@
   </section>
 
   <section class="dashboard-grid">
-    <article class="panel sales-panel">
-      <h3>Tỷ lệ mượn thiết bị</h3>
+    <article class="panel sales-panel section-card">
+      <div class="panel-head">
+        <h3>Tỷ lệ mượn thiết bị</h3>
+        <p>Phân bổ lượt mượn theo nhóm thiết bị đang hoạt động.</p>
+      </div>
 
       <div class="panel-state" *ngIf="loading">Đang tải dữ liệu tổng quan...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
@@ -56,8 +60,11 @@
       </div>
     </article>
 
-    <article class="panel">
-      <h3>Thiết bị được mượn nhiều nhất</h3>
+    <article class="panel section-card">
+      <div class="panel-head">
+        <h3>Thiết bị được mượn nhiều nhất</h3>
+        <p>Xếp hạng theo số lượng đã mượn và mức độ sử dụng thực tế.</p>
+      </div>
 
       <div class="panel-state" *ngIf="loading">Đang tải danh sách thiết bị...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
@@ -70,8 +77,8 @@
           <thead>
             <tr>
               <th>Thiết bị</th>
-              <th>Số lượng đã mượn</th>
-              <th>Số lượng còn lại</th>
+              <th>Đã mượn</th>
+              <th>Còn lại</th>
               <th>Đánh giá</th>
               <th>Trạng thái</th>
             </tr>
@@ -103,8 +110,11 @@
     </article>
   </section>
 
-  <article class="panel" *ngIf="authService.isAdmin()">
-    <h3>Phiếu mượn gần đây</h3>
+  <article class="panel section-card" *ngIf="authService.isAdmin()">
+    <div class="panel-head">
+      <h3>Phiếu mượn gần đây</h3>
+      <p>Những lượt mượn mới nhất trong hệ thống.</p>
+    </div>
 
     <div class="panel-state" *ngIf="loading">Đang tải danh sách mượn gần đây...</div>
     <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
@@ -113,17 +123,17 @@
     </div>
 
     <div class="table-wrapper" *ngIf="!loading && !errorMessage && orders.length">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Mã phiếu</th>
-              <th>Người mượn</th>
-              <th>Thiết bị</th>
-              <th>Số lượng</th>
-              <th>Ngày mượn</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Mã phiếu</th>
+            <th>Người mượn</th>
+            <th>Thiết bị</th>
+            <th>Số lượng</th>
+            <th>Ngày mượn</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
         <tbody>
           <tr *ngFor="let order of orders">
             <td>{{ order.orderLabel }}</td>

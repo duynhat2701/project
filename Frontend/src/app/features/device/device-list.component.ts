@@ -27,6 +27,7 @@ import { getDeviceStatusLabel } from '../../shared/utils/status-label.util';
     NzTableModule,
   ],
   templateUrl: './device-list.component.html',
+  styleUrl: './device-list.component.css',
 })
 export class DeviceListComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -187,6 +188,24 @@ export class DeviceListComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  protected getStatusClass(status: string): string {
+    const normalized = status.toUpperCase();
+
+    if (normalized === 'AVAILABLE') {
+      return 'status-chip status-chip-success';
+    }
+
+    if (normalized === 'LOW_STOCK') {
+      return 'status-chip status-chip-warning';
+    }
+
+    if (normalized === 'OUT_OF_STOCK') {
+      return 'status-chip status-chip-danger';
+    }
+
+    return 'status-chip';
   }
 
   private applySearch(): void {

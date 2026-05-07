@@ -1,15 +1,28 @@
 <div class="auth-shell">
-  <div class="auth-hero">
+  <section class="auth-hero">
     <p class="auth-eyebrow">Tạo tài khoản</p>
-    <h1>Tạo tài khoản mới cho hệ thống</h1>
+    <h1>Tạo người dùng mới cho hệ thống</h1>
     <p class="auth-copy">
-      Đăng ký người dùng mới để truy cập tổng quan, quản lý thiết bị và phiếu mượn trả.
+      Đăng ký tài khoản nhân viên mới để truy cập tổng quan, quản lý thiết bị và theo dõi phiếu mượn trả.
     </p>
-  </div>
 
-  <nz-card class="auth-card">
-    <h2>Đăng ký</h2>
-    <p class="auth-card-copy">Điền đầy đủ thông tin để tạo tài khoản mới.</p>
+    <div class="auth-feature-list">
+      <div class="auth-feature">
+        <strong>Khởi tạo nhanh</strong>
+        <span>Thiết lập tài khoản mới chỉ với các thông tin cơ bản cần thiết.</span>
+      </div>
+      <div class="auth-feature">
+        <strong>Sẵn sàng sử dụng</strong>
+        <span>Người dùng có thể đăng nhập ngay sau khi đăng ký thành công.</span>
+      </div>
+    </div>
+  </section>
+
+  <nz-card class="auth-card" [nzBordered]="false">
+    <div class="auth-card-head">
+      <h2>Đăng ký</h2>
+      <p class="auth-card-copy">Điền đầy đủ thông tin để tạo tài khoản mới.</p>
+    </div>
 
     <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
     <nz-alert
@@ -44,7 +57,7 @@
         </nz-form-control>
       </nz-form-item>
 
-      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting">Tạo tài khoản</button>
+      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Tạo tài khoản</button>
     </form>
 
     <p class="auth-switch">

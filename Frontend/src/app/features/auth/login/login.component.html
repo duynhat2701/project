@@ -1,15 +1,28 @@
 <div class="auth-shell">
-  <div class="auth-hero">
+  <section class="auth-hero">
     <p class="auth-eyebrow">Device Hub</p>
     <h1>Đăng nhập hệ thống quản lý thiết bị</h1>
     <p class="auth-copy">
-      Theo dõi thiết bị, duyệt yêu cầu mượn trả và quản lý danh mục trong một giao diện.
+      Theo dõi thiết bị, duyệt yêu cầu mượn trả và quản lý danh mục trong một không gian làm việc gọn gàng.
     </p>
-  </div>
 
-  <nz-card class="auth-card">
-    <h2>Đăng nhập</h2>
-    <p class="auth-card-copy">Sử dụng tài khoản đã được cấp để truy cập hệ thống.</p>
+    <div class="auth-feature-list">
+      <div class="auth-feature">
+        <strong>Kiểm soát tồn kho</strong>
+        <span>Theo dõi số lượng và trạng thái thiết bị theo thời gian thực.</span>
+      </div>
+      <div class="auth-feature">
+        <strong>Xử lý yêu cầu</strong>
+        <span>Duyệt phiếu mượn, trả thiết bị và cập nhật vòng đời sử dụng.</span>
+      </div>
+    </div>
+  </section>
+
+  <nz-card class="auth-card" [nzBordered]="false">
+    <div class="auth-card-head">
+      <h2>Đăng nhập</h2>
+      <p class="auth-card-copy">Sử dụng tài khoản đã được cấp để truy cập hệ thống.</p>
+    </div>
 
     <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
 
@@ -30,7 +43,7 @@
         </nz-form-control>
       </nz-form-item>
 
-      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting">Đăng nhập</button>
+      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Đăng nhập</button>
     </form>
 
     <p class="auth-switch">

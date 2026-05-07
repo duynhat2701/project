@@ -1,136 +1,191 @@
-<div *ngIf="errorMessage" style="margin-bottom: 16px; color: #d4380d; font-weight: 500;">
-  {{ errorMessage }}
-</div>
+<section class="page-shell borrow-page">
+  <div *ngIf="errorMessage" class="feedback-banner feedback-banner-error">
+    {{ errorMessage }}
+  </div>
 
-<div *ngIf="successMessage" style="margin-bottom: 16px; color: #389e0d; font-weight: 500;">
-  {{ successMessage }}
-</div>
+  <div *ngIf="successMessage" class="feedback-banner feedback-banner-success">
+    {{ successMessage }}
+  </div>
 
-<div style="margin-bottom: 12px;">
-  <button nz-button (click)="reloadAll()">Tải lại dữ liệu</button>
-</div>
-
-<ng-container *ngIf="authService.isEmployee(); else adminView">
-  <nz-card nzTitle="Tạo yêu cầu mượn" style="margin-bottom: 24px;">
-    <form nz-form [formGroup]="requestForm" (ngSubmit)="submitRequest()">
-      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:12px;">
-        <select formControlName="deviceId" style="height:32px;padding:4px 8px;">
-          <option [ngValue]="0">Chọn thiết bị</option>
-          <option *ngFor="let d of devices" [ngValue]="d.id">
-            {{ d.name }} - còn {{ d.quantity }}
-          </option>
-        </select>
-
-        <input nz-input type="number" formControlName="quantity" placeholder="Số lượng" />
-
-        <button nz-button nzType="primary" [nzLoading]="submitting">
-          Gửi yêu cầu
-        </button>
+  <nz-card class="section-card" [nzBordered]="false">
+    <div class="toolbar-row">
+      <div>
+        <h2 class="page-title">Mượn / Trả thiết bị</h2>
+        <p class="page-subtitle">Theo dõi yêu cầu, phê duyệt và cập nhật vòng đời thiết bị đang mượn.</p>
       </div>
-    </form>
+
+      <button nz-button nzType="default" (click)="reloadAll()">Tải lại dữ liệu</button>
+    </div>
   </nz-card>
 
-  <nz-card nzTitle="Yêu cầu của tôi" style="margin-bottom: 24px;">
-    <nz-table [nzData]="requests" [nzLoading]="loadingRequests" nzBordered>
-      <thead>
-      <tr>
-        <th>Thiết bị</th>
-        <th>Số lượng</th>
-        <th>Trạng thái</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let r of requests">
-        <td>{{ r.deviceName }}</td>
-        <td>{{ r.quantity }}</td>
-        <td>{{ getBorrowStatusLabel(r.status) }}</td>
-      </tr>
-      </tbody>
-    </nz-table>
-  </nz-card>
+  <ng-container *ngIf="authService.isEmployee(); else adminView">
+    <div class="borrow-grid">
+      <nz-card class="section-card borrow-panel" [nzBordered]="false">
+        <div class="borrow-panel-head">
+          <h3 class="page-title">Tạo yêu cầu mượn</h3>
+          <p class="page-subtitle">Chọn thiết bị và số lượng cần mượn.</p>
+        </div>
 
-  <nz-card nzTitle="Phiếu mượn của tôi">
-    <nz-table [nzData]="borrows" [nzLoading]="loadingBorrows" nzBordered>
-      <thead>
-      <tr>
-        <th>Thiết bị</th>
-        <th>Số lượng</th>
-        <th>Ngày mượn</th>
-        <th>Ngày trả</th>
-        <th>Trạng thái</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let b of borrows">
-        <td>{{ b.deviceName }}</td>
-        <td>{{ b.quantity }}</td>
-        <td>{{ b.borrowDate }}</td>
-        <td>{{ b.returnDate || '-' }}</td>
-        <td>{{ getBorrowStatusLabel(b.status) }}</td>
-      </tr>
-      </tbody>
-    </nz-table>
-  </nz-card>
-</ng-container>
+        <form nz-form [formGroup]="requestForm" (ngSubmit)="submitRequest()" class="surface-form">
+          <div class="surface-form-grid surface-form-grid-compact">
+            <select class="surface-select" formControlName="deviceId">
+              <option [ngValue]="0">Chọn thiết bị</option>
+              <option *ngFor="let d of devices" [ngValue]="d.id">
+                {{ d.name }} - còn {{ d.quantity }}
+              </option>
+            </select>
 
-<ng-template #adminView>
-  <nz-card nzTitle="Danh sách yêu cầu" style="margin-bottom: 24px;">
-    <nz-table [nzData]="requests" [nzLoading]="loadingRequests" nzBordered>
-      <thead>
-      <tr>
-        <th>Người mượn</th>
-        <th>Thiết bị</th>
-        <th>Số lượng</th>
-        <th>Trạng thái</th>
-        <th>Thao tác</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let r of requests">
-        <td>{{ r.userName }}</td>
-        <td>{{ r.deviceName }}</td>
-        <td>{{ r.quantity }}</td>
-        <td>{{ getBorrowStatusLabel(r.status) }}</td>
-        <td>
-          <button nz-button nzType="primary" *ngIf="r.status === 'PENDING'" (click)="approveRequest(r.id)">
-            Duyệt
-          </button>
-          <span *ngIf="r.status !== 'PENDING'">-</span>
-        </td>
-      </tr>
-      </tbody>
-    </nz-table>
-  </nz-card>
+            <input nz-input class="surface-field" type="number" formControlName="quantity" placeholder="Số lượng" />
 
-  <nz-card nzTitle="Danh sách mượn / trả">
-    <nz-table [nzData]="borrows" [nzLoading]="loadingBorrows" nzBordered>
-      <thead>
-      <tr>
-        <th>Người mượn</th>
-        <th>Thiết bị</th>
-        <th>Số lượng</th>
-        <th>Ngày mượn</th>
-        <th>Ngày trả</th>
-        <th>Trạng thái</th>
-        <th>Thao tác</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let b of borrows">
-        <td>{{ b.userName }}</td>
-        <td>{{ b.deviceName }}</td>
-        <td>{{ b.quantity }}</td>
-        <td>{{ b.borrowDate }}</td>
-        <td>{{ b.returnDate || '-' }}</td>
-        <td>{{ getBorrowStatusLabel(b.status) }}</td>
-        <td>
-          <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">
-            Trả thiết bị
-          </button>
-          <span *ngIf="b.status !== 'BORROWING'">-</span>
-        </td>
-      </tr>
-      </tbody>
-    </nz-table>
-  </nz-card>
-</ng-template>
+            <button nz-button nzType="primary" [nzLoading]="submitting">Gửi</button>
+          </div>
+        </form>
+      </nz-card>
+
+      <nz-card class="section-card borrow-panel" [nzBordered]="false">
+        <div class="borrow-panel-head">
+          <h3 class="page-title">Yêu cầu của tôi</h3>
+          <p class="page-subtitle">Các yêu cầu đang chờ và đã được xử lý.</p>
+        </div>
+
+        <nz-table class="table-primary" [nzData]="requests" [nzLoading]="loadingRequests" [nzBordered]="false">
+          <thead>
+            <tr>
+              <th>Thiết bị</th>
+              <th>Số lượng</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of requests">
+              <td>{{ r.deviceName }}</td>
+              <td>{{ r.quantity }}</td>
+              <td>
+                <span [class]="getStatusClass(r.status)">{{ getBorrowStatusLabel(r.status) }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+
+    <nz-card class="section-card borrow-panel" [nzBordered]="false">
+      <div class="borrow-panel-head">
+        <h3 class="page-title">Phiếu mượn của tôi</h3>
+        <p class="page-subtitle">Lịch sử mượn và ngày trả tương ứng.</p>
+      </div>
+
+      <nz-table class="table-primary" [nzData]="borrows" [nzLoading]="loadingBorrows" [nzBordered]="false">
+        <thead>
+          <tr>
+            <th>Thiết bị</th>
+            <th>Số lượng</th>
+            <th>Ngày mượn</th>
+            <th>Ngày trả</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of borrows">
+            <td>{{ b.deviceName }}</td>
+            <td>{{ b.quantity }}</td>
+            <td>{{ b.borrowDate }}</td>
+            <td>{{ b.returnDate || '-' }}</td>
+            <td>
+              <span [class]="getStatusClass(b.status)">{{ getBorrowStatusLabel(b.status) }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </ng-container>
+
+  <ng-template #adminView>
+    <nz-card class="section-card borrow-panel" [nzBordered]="false">
+      <div class="borrow-panel-head">
+        <h3 class="page-title">Danh sách yêu cầu</h3>
+        <p class="page-subtitle">Kiểm tra yêu cầu mới và xử lý các phiếu đang chờ.</p>
+      </div>
+
+      <nz-table class="table-primary" [nzData]="requests" [nzLoading]="loadingRequests" [nzBordered]="false">
+        <thead>
+          <tr>
+            <th>Người mượn</th>
+            <th>Thiết bị</th>
+            <th>Số lượng</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of requests">
+            <td>
+              <div class="borrow-user">
+                <strong>{{ r.userName }}</strong>
+                <span class="borrow-date">Mã yêu cầu #{{ r.id }}</span>
+              </div>
+            </td>
+            <td>{{ r.deviceName }}</td>
+            <td>{{ r.quantity }}</td>
+            <td>
+              <span [class]="getStatusClass(r.status)">{{ getBorrowStatusLabel(r.status) }}</span>
+            </td>
+            <td>
+              <div class="table-actions">
+                <button nz-button nzType="primary" *ngIf="r.status === 'PENDING'" (click)="approveRequest(r.id)">
+                  Duyệt
+                </button>
+                <span class="muted-note" *ngIf="r.status !== 'PENDING'">Đã xử lý</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+
+    <nz-card class="section-card borrow-panel" [nzBordered]="false">
+      <div class="borrow-panel-head">
+        <h3 class="page-title">Danh sách mượn / trả</h3>
+        <p class="page-subtitle">Theo dõi thiết bị đang được sử dụng và các phiếu đã hoàn tất.</p>
+      </div>
+
+      <nz-table class="table-primary" [nzData]="borrows" [nzLoading]="loadingBorrows" [nzBordered]="false">
+        <thead>
+          <tr>
+            <th>Người mượn</th>
+            <th>Thiết bị</th>
+            <th>Số lượng</th>
+            <th>Ngày mượn</th>
+            <th>Ngày trả</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of borrows">
+            <td>
+              <div class="borrow-user">
+                <strong>{{ b.userName }}</strong>
+                <span class="borrow-date">{{ b.borrowDate }}</span>
+              </div>
+            </td>
+            <td>{{ b.deviceName }}</td>
+            <td>{{ b.quantity }}</td>
+            <td>{{ b.borrowDate }}</td>
+            <td>{{ b.returnDate || '-' }}</td>
+            <td>
+              <span [class]="getStatusClass(b.status)">{{ getBorrowStatusLabel(b.status) }}</span>
+            </td>
+            <td>
+              <div class="table-actions">
+                <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">
+                  Trả thiết bị
+                </button>
+                <span class="muted-note" *ngIf="b.status !== 'BORROWING'">Hoàn tất</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </nz-card>
+  </ng-template>
