@@ -23,13 +23,13 @@ export class BorrowService {
   }
 
   approve(requestId: number): Observable<Borrow> {
-    return this.http.post<ApiResponse<Borrow>>(`${this.api}/Chấp Thuận/${requestId}`, {}).pipe(
+    return this.http.post<ApiResponse<Borrow>>(`${this.api}/approve/${requestId}`, {}).pipe(
       map((response) => response.data),
     );
   }
 
   returnDevice(borrowId: number): Observable<Borrow> {
-    return this.http.post<ApiResponse<Borrow>>(`${this.api}/Đã Trả/${borrowId}`, {}).pipe(
+    return this.http.post<ApiResponse<Borrow>>(`${this.api}/return/${borrowId}`, {}).pipe(
       map((response) => response.data),
     );
   }

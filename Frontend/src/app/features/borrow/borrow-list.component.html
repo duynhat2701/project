@@ -92,10 +92,10 @@
         <td>{{ r.quantity }}</td>
         <td>{{ r.status }}</td>
         <td>
-          <button nz-button nzType="primary" *ngIf="r.status === 'Chờ Duyệt'" (click)="approveRequest(r.id)">
+          <button nz-button nzType="primary" *ngIf="r.status === 'PENDING'" (click)="approveRequest(r.id)">
             Duyệt
           </button>
-          <span *ngIf="r.status !== 'Chờ Duyệt'">-</span>
+          <span *ngIf="r.status !== 'PENDING'">-</span>
         </td>
       </tr>
       </tbody>
@@ -124,10 +124,10 @@
         <td>{{ b.returnDate || '-' }}</td>
         <td>{{ b.status }}</td>
         <td>
-          <button nz-button nzDanger *ngIf="b.status === 'Đang Mượn'" (click)="returnDevice(b.id)">
+          <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">
             Trả thiết bị
           </button>
-          <span *ngIf="b.status !== 'Đang Mượn'">-</span>
+          <span *ngIf="b.status !== 'BORROWING'">-</span>
         </td>
       </tr>
       </tbody>
