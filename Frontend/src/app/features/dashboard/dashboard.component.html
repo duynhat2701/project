@@ -27,7 +27,7 @@
       <article class="summary-card">
         <span>Phiếu mượn</span>
         <strong>{{ authService.isAdmin() ? orders.length : 0 }}</strong>
-        <p>{{ authService.isAdmin() ? 'Chi hien thi cho tai khoan admin.' : 'An doi voi tai khoan nhan vien.' }}</p>
+        <p>{{ authService.isAdmin() ? 'Chỉ hiện thị cho tài khoản admin.' : 'Ẩn đối với tài khoản nhân viên.' }}</p>
       </article>
     </div>
   </section>
@@ -36,10 +36,10 @@
     <article class="panel sales-panel">
       <h3>Tỷ lệ mượn thiết bị</h3>
 
-      <div class="panel-state" *ngIf="loading">Dang tai du lieu dashboard...</div>
+      <div class="panel-state" *ngIf="loading">Đang tải dữ liệu dashboard...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
       <div class="panel-state" *ngIf="!loading && !errorMessage && !salesCategories.length">
-        Chua co du lieu muon thiet bi de hien thi bieu do.
+        Chưa có dữ liệu mượn thiết bị để hiển thị biểu đồ.
       </div>
 
       <div class="sales-chart" *ngIf="!loading && !errorMessage && salesCategories.length" [style.--chart-background]="donutStyle"></div>
@@ -59,10 +59,10 @@
     <article class="panel">
       <h3>Thiết bị được mượn nhiều nhất</h3>
 
-      <div class="panel-state" *ngIf="loading">Dang tai danh sach thiet bi...</div>
+      <div class="panel-state" *ngIf="loading">Đang tải danh sách thiết bị...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
       <div class="panel-state" *ngIf="!loading && !errorMessage && !topProducts.length">
-        Chua co thiet bi nao duoc muon.
+        Chưa có thiết bị nào được mượn.
       </div>
 
       <div class="table-wrapper" *ngIf="!loading && !errorMessage && topProducts.length">
@@ -106,10 +106,10 @@
   <article class="panel" *ngIf="authService.isAdmin()">
     <h3>Phiếu mượn gần đây</h3>
 
-    <div class="panel-state" *ngIf="loading">Dang tai danh sach muon gan day...</div>
+    <div class="panel-state" *ngIf="loading">Đang tải danh sách mượn gần đây...</div>
     <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
     <div class="panel-state" *ngIf="!loading && !errorMessage && !orders.length">
-      Chua co giao dich muon tra nao.
+      Chưa có giao dịch mượn trả nào.
     </div>
 
     <div class="table-wrapper" *ngIf="!loading && !errorMessage && orders.length">

@@ -1,4 +1,4 @@
-<nz-card nzTitle="Danh sach thiet bi">
+<nz-card nzTitle="Danh sách thiết bị">
   <div *ngIf="errorMessage" style="margin-bottom: 16px; color: #d4380d; font-weight: 500;">
     {{ errorMessage }}
   </div>
@@ -8,22 +8,22 @@
       nz-input
       [ngModel]="searchKeyword"
       (ngModelChange)="onSearchChange($event)"
-      placeholder="Tim theo ten, ma hoac trang thai"
+      placeholder="Tìm theo tên, mã hoặc trạng thái"
     />
   </div>
 
   <ng-container *ngIf="authService.isAdmin()">
     <form nz-form [formGroup]="form" (ngSubmit)="submit()" style="margin-bottom: 24px;">
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
-        <input nz-input formControlName="name" placeholder="Ten thiet bi" />
-        <input nz-input formControlName="code" placeholder="Ma thiet bi" />
-        <input nz-input type="number" formControlName="quantity" placeholder="So luong" />
-        <input nz-input formControlName="status" placeholder="AVAILABLE / OUT_OF_STOCK" />
+        <input nz-input formControlName="name" placeholder="Tên thiết bị" />
+        <input nz-input formControlName="code" placeholder="Mã thiết bị" />
+        <input nz-input type="number" formControlName="quantity" placeholder="Số lượng" />
+        <input nz-input formControlName="status" placeholder="Có Sẵn / OUT_OF_STOCK" />
       </div>
 
       <div style="margin-top:12px; display:flex; gap:12px;">
         <button nz-button nzType="primary" [nzLoading]="submitting">
-          {{ editingDeviceId ? 'Cap nhat thiet bi' : 'Them thiet bi' }}
+          {{ editingDeviceId ? 'Cập nhật thiết bị' : 'Thêm thiết bị' }}
         </button>
 
         <button
@@ -42,11 +42,11 @@
   <nz-table [nzData]="filteredDevices" [nzLoading]="loading" nzBordered>
     <thead>
       <tr>
-        <th>Ten</th>
-        <th>Ma</th>
-        <th>So luong</th>
-        <th>Trang thai</th>
-        <th *ngIf="authService.isAdmin()">Thao tac</th>
+        <th>Tên</th>
+        <th>Mã</th>
+        <th>Số lượng</th>
+        <th>Trạng thái</th>
+        <th *ngIf="authService.isAdmin()">Thao tác</th>
       </tr>
     </thead>
 
@@ -57,8 +57,8 @@
         <td>{{ d.quantity }}</td>
         <td>{{ d.status }}</td>
         <td *ngIf="authService.isAdmin()" style="display:flex; gap:8px;">
-          <button nz-button (click)="startEdit(d)">Cap nhat</button>
-          <button nz-button nzDanger (click)="deleteDevice(d.id)">Xoa</button>
+          <button nz-button (click)="startEdit(d)">Cập nhật</button>
+          <button nz-button nzDanger (click)="deleteDevice(d.id)">Xóa</button>
         </td>
       </tr>
     </tbody>

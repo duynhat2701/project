@@ -27,12 +27,12 @@
 
       <div class="notification-panel" *ngIf="isNotificationOpen">
         <div class="notification-panel-header">
-          <strong>Thong bao</strong>
+          <strong>Thông Báo</strong>
           <span>{{ notificationCount }} moi</span>
         </div>
 
         <div class="notification-empty" *ngIf="!notificationItems.length">
-          Khong co thong bao nao de hien thi.
+          Không có thông báo nào để hiển thị.
         </div>
 
         <div class="notification-list" *ngIf="notificationItems.length">
