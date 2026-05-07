@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { Borrow } from '../../shared/models/borrow.model';
 import { ApiResponse } from '../../shared/models/api-response.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BorrowService {
-  private readonly api = 'https://project-1-y5rk.onrender.com/api/borrows';
+  private readonly api = `${environment.apiBaseUrl}/borrows`;
 
   constructor(private http: HttpClient) {}
 

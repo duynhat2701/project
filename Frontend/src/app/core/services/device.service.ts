@@ -3,10 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from '../../shared/models/api-response.model';
 import { Device } from '../../shared/models/device.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
-  private readonly api = 'https://project-1-y5rk.onrender.com/api/devices';
+  private readonly api = `${environment.apiBaseUrl}/devices`;
 
   constructor(private http: HttpClient) {}
 

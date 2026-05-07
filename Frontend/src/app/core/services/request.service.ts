@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiResponse } from '../../shared/models/api-response.model';
 import { RequestItem } from '../../shared/models/request.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RequestService {
-  private readonly api = 'https://project-1-y5rk.onrender.com/api/requests';
+  private readonly api = `${environment.apiBaseUrl}/requests`;
 
   constructor(private http: HttpClient) {}
 

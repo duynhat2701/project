@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import { ApiResponse } from '../../shared/models/api-response.model';
+import { environment } from '../../../environments/environment';
 
 export interface LoginPayload {
   email: string;
@@ -33,7 +34,7 @@ export interface UserResponse {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly baseUrl = 'https://project-1-y5rk.onrender.com/api';
+  private readonly baseUrl = environment.apiBaseUrl;
   private readonly tokenKey = 'token';
   private readonly userKey = 'currentUser';
   private readonly storage = sessionStorage;

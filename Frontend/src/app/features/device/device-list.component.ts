@@ -11,6 +11,7 @@ import { catchError, finalize, of, timeout } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { DeviceService } from '../../core/services/device.service';
 import { Device } from '../../shared/models/device.model';
+import { getActionErrorMessage, getLoadErrorMessage } from '../../shared/utils/http-error.util';
 import { getDeviceStatusLabel } from '../../shared/utils/status-label.util';
 
 @Component({
@@ -72,14 +73,9 @@ export class DeviceListComponent implements OnInit {
       .pipe(
         timeout(15000),
         takeUntilDestroyed(this.destroyRef),
-        catchError((err) => {
-          console.error('Load devices error:', err);
-          this.errorMessage =
-            err?.status === 0
-              ? 'Không kết nối được server.'
-              : err?.status === 504 || err?.name === 'TimeoutError'
-                ? 'Server đang khởi động, vui lòng thử lại sau ít giây.'
-                : err?.error?.message || 'Không tải được danh sách thiết bị.';
+        catchError((error) => {
+          console.error('Load devices error:', error);
+          this.errorMessage = getLoadErrorMessage(error, 'Không tải được danh sách thiết bị.');
           return of([] as Device[]);
         }),
         finalize(() => {
@@ -87,8 +83,8 @@ export class DeviceListComponent implements OnInit {
           this.cdr.detectChanges();
         }),
       )
-      .subscribe((res) => {
-        this.devices = [...res];
+      .subscribe((devices) => {
+        this.devices = [...devices];
         this.applySearch();
         this.cdr.detectChanges();
       });
@@ -123,18 +119,12 @@ export class DeviceListComponent implements OnInit {
           this.resetForm();
           this.loadData();
         },
-        error: (err) => {
-          console.error('Save device error:', err);
-          this.errorMessage =
-            err?.status === 403
-              ? 'Bạn không có quyền thao tác với thiết bị.'
-              : err?.status === 401
-                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
-                : err?.status === 0
-                  ? 'Không kết nối được server.'
-                  : err?.name === 'TimeoutError'
-                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
-                    : err?.error?.message || 'Lưu thiết bị thất bại.';
+        error: (error) => {
+          console.error('Save device error:', error);
+          this.errorMessage = getActionErrorMessage(error, {
+            forbiddenMessage: 'Bạn không có quyền thao tác với thiết bị.',
+            fallbackMessage: 'Lưu thiết bị thất bại.',
+          });
           this.cdr.detectChanges();
         },
       });
@@ -182,9 +172,12 @@ export class DeviceListComponent implements OnInit {
       )
       .subscribe({
         next: () => this.loadData(),
-        error: (err) => {
-          console.error('Delete device error:', err);
-          this.errorMessage = err?.error?.message || 'Xóa thiết bị thất bại.';
+        error: (error) => {
+          console.error('Delete device error:', error);
+          this.errorMessage = getActionErrorMessage(error, {
+            forbiddenMessage: 'Bạn không có quyền xóa thiết bị.',
+            fallbackMessage: 'Xóa thiết bị thất bại.',
+          });
           this.cdr.detectChanges();
         },
       });

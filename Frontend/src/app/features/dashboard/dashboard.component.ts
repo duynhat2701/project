@@ -7,6 +7,7 @@ import { BorrowService } from '../../core/services/borrow.service';
 import { DeviceService } from '../../core/services/device.service';
 import { Borrow } from '../../shared/models/borrow.model';
 import { Device } from '../../shared/models/device.model';
+import { getLoadErrorMessage } from '../../shared/utils/http-error.util';
 import { getBorrowStatusLabel, getRoleLabel } from '../../shared/utils/status-label.util';
 
 interface ProductStat {
@@ -17,7 +18,6 @@ interface ProductStat {
   borrowCount: number;
   rating: number;
   status: 'Còn hàng' | 'Sắp hết' | 'Hết hàng';
-  accent: string;
 }
 
 interface SalesCategory {
@@ -99,20 +99,8 @@ export class DashboardComponent implements OnInit {
     return this.topProducts.reduce((sum, product) => sum + product.borrowedQuantity, 0);
   }
 
-  private buildDonutStyle(categories: SalesCategory[]): string {
-    if (!categories.length) {
-      return 'conic-gradient(#e2e8f0 0% 100%)';
-    }
-
-    let start = 0;
-    const segments = categories.map((category) => {
-      const end = start + category.share;
-      const segment = `${category.color} ${start}% ${end}%`;
-      start = end;
-      return segment;
-    });
-
-    return `conic-gradient(${segments.join(', ')})`;
+  getOrderStatusLabel(status: string): string {
+    return getBorrowStatusLabel(status);
   }
 
   private loadDashboard(): void {
@@ -131,14 +119,9 @@ export class DashboardComponent implements OnInit {
       .pipe(
         timeout(15000),
         takeUntilDestroyed(this.destroyRef),
-        catchError((err) => {
-          console.error('Load dashboard error:', err);
-          this.errorMessage =
-            err?.status === 0
-              ? 'Không kết nối được server.'
-              : err?.status === 504 || err?.name === 'TimeoutError'
-                ? 'Server đang khởi động, vui lòng thử lại sau ít giây.'
-                : err?.error?.message || 'Không tải được dữ liệu tổng quan.';
+        catchError((error) => {
+          console.error('Load dashboard error:', error);
+          this.errorMessage = getLoadErrorMessage(error, 'Không tải được dữ liệu tổng quan.');
           return of({ devices: [] as Device[], borrows: [] as Borrow[] });
         }),
         finalize(() => {
@@ -153,6 +136,16 @@ export class DashboardComponent implements OnInit {
   }
 
   private buildDashboard(devices: Device[], borrows: Borrow[]): void {
+    const borrowGroups = this.groupBorrowsByDevice(borrows);
+    const rankedProducts = this.rankProducts(devices, borrowGroups);
+
+    this.topProducts = this.buildTopProducts(rankedProducts);
+    this.salesCategories = this.buildSalesCategories(this.topProducts);
+    this.donutStyle = this.buildDonutStyle(this.salesCategories);
+    this.orders = this.buildRecentOrders(borrows);
+  }
+
+  private groupBorrowsByDevice(borrows: Borrow[]): Map<number, Borrow[]> {
     const borrowGroups = new Map<number, Borrow[]>();
 
     for (const borrow of borrows) {
@@ -161,24 +154,25 @@ export class DashboardComponent implements OnInit {
       borrowGroups.set(borrow.deviceId, current);
     }
 
-    const products = devices.map((device, index) => {
-      const deviceBorrows = borrowGroups.get(device.id) ?? [];
-      const borrowedQuantity = deviceBorrows.reduce((sum, item) => sum + item.quantity, 0);
-      const borrowCount = deviceBorrows.length;
+    return borrowGroups;
+  }
 
-      return {
-        id: device.id,
-        name: device.name,
-        availableQuantity: device.quantity,
-        borrowedQuantity,
-        borrowCount,
-        rating: 0,
-        status: this.mapInventoryStatus(device.quantity),
-        accent: this.buildAccent(index),
-      };
-    });
+  private rankProducts(devices: Device[], borrowGroups: Map<number, Borrow[]>): ProductStat[] {
+    return devices
+      .map((device) => {
+        const deviceBorrows = borrowGroups.get(device.id) ?? [];
+        const borrowedQuantity = deviceBorrows.reduce((sum, item) => sum + item.quantity, 0);
 
-    const rankedProducts = products
+        return {
+          id: device.id,
+          name: device.name,
+          availableQuantity: device.quantity,
+          borrowedQuantity,
+          borrowCount: deviceBorrows.length,
+          rating: 0,
+          status: this.mapInventoryStatus(device.quantity),
+        };
+      })
       .filter((product) => product.borrowedQuantity > 0 || product.availableQuantity > 0)
       .sort((a, b) => {
         if (b.borrowedQuantity !== a.borrowedQuantity) {
@@ -187,30 +181,34 @@ export class DashboardComponent implements OnInit {
 
         return b.borrowCount - a.borrowCount;
       });
+  }
 
-    const maxBorrowedQuantity = rankedProducts[0]?.borrowedQuantity ?? 0;
+  private buildTopProducts(products: ProductStat[]): ProductStat[] {
+    const maxBorrowedQuantity = products[0]?.borrowedQuantity ?? 0;
 
-    this.topProducts = rankedProducts.slice(0, 6).map((product) => ({
+    return products.slice(0, 6).map((product) => ({
       ...product,
       rating: maxBorrowedQuantity > 0 ? Number(((product.borrowedQuantity / maxBorrowedQuantity) * 5).toFixed(1)) : 0,
     }));
+  }
 
-    const chartItems = this.topProducts
+  private buildSalesCategories(products: ProductStat[]): SalesCategory[] {
+    const chartItems = products
       .filter((product) => product.borrowedQuantity > 0)
       .slice(0, 4);
 
     const totalBorrowed = chartItems.reduce((sum, item) => sum + item.borrowedQuantity, 0);
 
-    this.salesCategories = chartItems.map((item, index) => ({
+    return chartItems.map((item, index) => ({
       name: item.name,
       value: item.borrowedQuantity,
       share: totalBorrowed > 0 ? Number(((item.borrowedQuantity / totalBorrowed) * 100).toFixed(1)) : 0,
       color: this.chartColors[index % this.chartColors.length],
     }));
+  }
 
-    this.donutStyle = this.buildDonutStyle(this.salesCategories);
-
-    this.orders = borrows
+  private buildRecentOrders(borrows: Borrow[]): OrderStat[] {
+    return borrows
       .slice()
       .sort((a, b) => new Date(b.borrowDate).getTime() - new Date(a.borrowDate).getTime())
       .slice(0, 5)
@@ -220,8 +218,20 @@ export class DashboardComponent implements OnInit {
       }));
   }
 
-  getOrderStatusLabel(status: string): string {
-    return getBorrowStatusLabel(status);
+  private buildDonutStyle(categories: SalesCategory[]): string {
+    if (!categories.length) {
+      return 'conic-gradient(#e2e8f0 0% 100%)';
+    }
+
+    let start = 0;
+    const segments = categories.map((category) => {
+      const end = start + category.share;
+      const segment = `${category.color} ${start}% ${end}%`;
+      start = end;
+      return segment;
+    });
+
+    return `conic-gradient(${segments.join(', ')})`;
   }
 
   private mapInventoryStatus(quantity: number): ProductStat['status'] {
@@ -234,18 +244,5 @@ export class DashboardComponent implements OnInit {
     }
 
     return 'Còn hàng';
-  }
-
-  private buildAccent(index: number): string {
-    const accents = [
-      'linear-gradient(135deg, #f59e0b, #f97316)',
-      'linear-gradient(135deg, #10b981, #0f766e)',
-      'linear-gradient(135deg, #06b6d4, #2563eb)',
-      'linear-gradient(135deg, #8b5cf6, #ec4899)',
-      'linear-gradient(135deg, #fde047, #84cc16)',
-      'linear-gradient(135deg, #94a3b8, #475569)',
-    ];
-
-    return accents[index % accents.length];
   }
 }
