@@ -18,7 +18,9 @@
         <input nz-input formControlName="name" placeholder="Tên thiết bị" />
         <input nz-input formControlName="code" placeholder="Mã thiết bị" />
         <input nz-input type="number" formControlName="quantity" placeholder="Số lượng" />
-        <input nz-input formControlName="status" placeholder="Có Sẵn / OUT_OF_STOCK" />
+        <select formControlName="status" style="height:32px;padding:4px 8px;">
+          <option *ngFor="let option of statusOptions" [ngValue]="option.value">{{ option.label }}</option>
+        </select>
       </div>
 
       <div style="margin-top:12px; display:flex; gap:12px;">
@@ -33,7 +35,7 @@
           nzType="default"
           (click)="cancelEdit()"
         >
-          Huy
+          Hủy
         </button>
       </div>
     </form>
@@ -55,7 +57,7 @@
         <td>{{ d.name }}</td>
         <td>{{ d.code }}</td>
         <td>{{ d.quantity }}</td>
-        <td>{{ d.status }}</td>
+        <td>{{ getDeviceStatusLabel(d.status) }}</td>
         <td *ngIf="authService.isAdmin()" style="display:flex; gap:8px;">
           <button nz-button (click)="startEdit(d)">Cập nhật</button>
           <button nz-button nzDanger (click)="deleteDevice(d.id)">Xóa</button>

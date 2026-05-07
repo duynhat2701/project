@@ -36,6 +36,7 @@ export class AuthService {
   private readonly baseUrl = 'https://project-1-y5rk.onrender.com/api';
   private readonly tokenKey = 'token';
   private readonly userKey = 'currentUser';
+  private readonly storage = sessionStorage;
 
   constructor(private http: HttpClient) {}
 
@@ -56,19 +57,19 @@ export class AuthService {
   }
 
   saveToken(token: string): void {
-    localStorage.setItem(this.tokenKey, token);
+    this.storage.setItem(this.tokenKey, token);
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    return this.storage.getItem(this.tokenKey);
   }
 
   saveUser(user: LoginResponse): void {
-    localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.storage.setItem(this.userKey, JSON.stringify(user));
   }
 
   getUser(): LoginResponse | null {
-    const rawUser = localStorage.getItem(this.userKey);
+    const rawUser = this.storage.getItem(this.userKey);
     return rawUser ? (JSON.parse(rawUser) as LoginResponse) : null;
   }
 
@@ -85,7 +86,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.userKey);
+    this.storage.removeItem(this.tokenKey);
+    this.storage.removeItem(this.userKey);
   }
 }

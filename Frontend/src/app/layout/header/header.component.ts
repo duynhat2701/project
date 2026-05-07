@@ -10,6 +10,7 @@ import { BorrowService } from '../../core/services/borrow.service';
 import { RequestService } from '../../core/services/request.service';
 import { Borrow } from '../../shared/models/borrow.model';
 import { RequestItem } from '../../shared/models/request.model';
+import { getBorrowStatusLabel } from '../../shared/utils/status-label.util';
 
 interface HeaderNotificationItem {
   id: string;
@@ -60,13 +61,13 @@ export class HeaderComponent implements OnInit {
   protected get notificationLabel(): string {
     if (this.authService.isAdmin()) {
       return this.notificationCount > 0
-        ? `${this.notificationCount} yeu cau muon dang cho duyet`
-        : 'Khong co yeu cau muon moi';
+        ? `${this.notificationCount} yêu cầu mượn đang chờ duyệt`
+        : 'Không có yêu cầu mượn mới';
     }
 
     return this.notificationCount > 0
-      ? `${this.notificationCount} phieu muon da duoc duyet`
-      : 'Chua co phieu muon nao duoc duyet';
+      ? `${this.notificationCount} phiếu mượn đã được duyệt`
+      : 'Chưa có phiếu mượn nào được duyệt';
   }
 
   protected toggleNotifications(event: MouseEvent): void {
@@ -112,10 +113,10 @@ export class HeaderComponent implements OnInit {
           this.notificationItems = pendingRequests.map((item) => ({
             id: `request-${item.id}`,
             signature: `admin-request-${item.id}-${item.status}`,
-            title: `${item.userName} gui yeu cau muon`,
+            title: `${item.userName} gửi yêu cầu mượn`,
             detail: `${item.deviceName} x ${item.quantity}`,
-            status: 'Cho duyet',
-            timeLabel: `Ma yeu cau #${item.id}`,
+            status: 'Chờ duyệt',
+            timeLabel: `Mã yêu cầu #${item.id}`,
           }));
           this.syncNotificationState();
           return;
@@ -129,9 +130,9 @@ export class HeaderComponent implements OnInit {
         this.notificationItems = approvedBorrows.map((item) => ({
           id: `borrow-${item.id}`,
           signature: `employee-borrow-${item.id}-${item.status}`,
-          title: 'Phieu muon da duoc duyet',
+          title: 'Phiếu mượn đã được duyệt',
           detail: `${item.deviceName} x ${item.quantity}`,
-          status: item.status,
+          status: getBorrowStatusLabel(item.status),
           timeLabel: this.formatDate(item.borrowDate),
         }));
         this.syncNotificationState();

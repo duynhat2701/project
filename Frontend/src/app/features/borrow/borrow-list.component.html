@@ -43,7 +43,7 @@
       <tr *ngFor="let r of requests">
         <td>{{ r.deviceName }}</td>
         <td>{{ r.quantity }}</td>
-        <td>{{ r.status }}</td>
+        <td>{{ getBorrowStatusLabel(r.status) }}</td>
       </tr>
       </tbody>
     </nz-table>
@@ -66,7 +66,7 @@
         <td>{{ b.quantity }}</td>
         <td>{{ b.borrowDate }}</td>
         <td>{{ b.returnDate || '-' }}</td>
-        <td>{{ b.status }}</td>
+        <td>{{ getBorrowStatusLabel(b.status) }}</td>
       </tr>
       </tbody>
     </nz-table>
@@ -90,7 +90,7 @@
         <td>{{ r.userName }}</td>
         <td>{{ r.deviceName }}</td>
         <td>{{ r.quantity }}</td>
-        <td>{{ r.status }}</td>
+        <td>{{ getBorrowStatusLabel(r.status) }}</td>
         <td>
           <button nz-button nzType="primary" *ngIf="r.status === 'PENDING'" (click)="approveRequest(r.id)">
             Duyệt
@@ -122,7 +122,7 @@
         <td>{{ b.quantity }}</td>
         <td>{{ b.borrowDate }}</td>
         <td>{{ b.returnDate || '-' }}</td>
-        <td>{{ b.status }}</td>
+        <td>{{ getBorrowStatusLabel(b.status) }}</td>
         <td>
           <button nz-button nzDanger *ngIf="b.status === 'BORROWING'" (click)="returnDevice(b.id)">
             Trả thiết bị

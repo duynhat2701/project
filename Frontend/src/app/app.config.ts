@@ -6,11 +6,11 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { routes } from './app.routes';
 import { icons } from './icons-provider';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
-import { en_US, provideNzI18n } from 'ng-zorro-antd/i18n';
+import { provideNzI18n, vi_VN } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
-import en from '@angular/common/locales/en';
+import vi from '@angular/common/locales/vi';
 
-registerLocaleData(en);
+registerLocaleData(vi);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +18,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideRouter(routes),
     provideNzIcons(icons),
-    provideNzI18n(en_US),
+    provideNzI18n(vi_VN),
   ],
 };

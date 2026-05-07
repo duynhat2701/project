@@ -8,13 +8,14 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { catchError, finalize, of, timeout } from 'rxjs';
+import { AuthService } from '../../core/services/auth.service';
 import { BorrowService } from '../../core/services/borrow.service';
 import { DeviceService } from '../../core/services/device.service';
 import { RequestService } from '../../core/services/request.service';
-import { AuthService } from '../../core/services/auth.service';
 import { Borrow } from '../../shared/models/borrow.model';
 import { Device } from '../../shared/models/device.model';
 import { RequestItem } from '../../shared/models/request.model';
+import { getBorrowStatusLabel } from '../../shared/utils/status-label.util';
 
 @Component({
   selector: 'app-borrow-list',
@@ -31,6 +32,7 @@ export class BorrowListComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
 
   protected authService = inject(AuthService);
+  protected readonly getBorrowStatusLabel = getBorrowStatusLabel;
 
   protected devices: Device[] = [];
   protected requests: RequestItem[] = [];

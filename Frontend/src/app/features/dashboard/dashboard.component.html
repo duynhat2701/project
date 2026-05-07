@@ -1,13 +1,13 @@
 <section class="dashboard">
   <section class="dashboard-hero">
     <div class="dashboard-hero-copy">
-      <h2>Tổng quan dashboard</h2>
+      <h2>Tổng quan hệ thống</h2>
       <p>
         Theo dõi tình trạng sử dụng thiết bị, thiết bị được mượn nhiều nhất và hoạt động mượn gần đây tại một nơi.
       </p>
       <div class="dashboard-user-role">
         Vai trò hiện tại:
-        <strong>{{ authService.getUser()?.role }}</strong>
+        <strong>{{ getRoleLabel(authService.getUser()?.role) }}</strong>
       </div>
     </div>
 
@@ -27,7 +27,7 @@
       <article class="summary-card">
         <span>Phiếu mượn</span>
         <strong>{{ authService.isAdmin() ? orders.length : 0 }}</strong>
-        <p>{{ authService.isAdmin() ? 'Chỉ hiện thị cho tài khoản admin.' : 'Ẩn đối với tài khoản nhân viên.' }}</p>
+        <p>{{ authService.isAdmin() ? 'Chỉ hiển thị cho tài khoản quản trị viên.' : 'Ẩn đối với tài khoản nhân viên.' }}</p>
       </article>
     </div>
   </section>
@@ -36,7 +36,7 @@
     <article class="panel sales-panel">
       <h3>Tỷ lệ mượn thiết bị</h3>
 
-      <div class="panel-state" *ngIf="loading">Đang tải dữ liệu dashboard...</div>
+      <div class="panel-state" *ngIf="loading">Đang tải dữ liệu tổng quan...</div>
       <div class="panel-state panel-state-error" *ngIf="!loading && errorMessage">{{ errorMessage }}</div>
       <div class="panel-state" *ngIf="!loading && !errorMessage && !salesCategories.length">
         Chưa có dữ liệu mượn thiết bị để hiển thị biểu đồ.
@@ -130,7 +130,7 @@
             <td>{{ order.userName }}</td>
             <td>{{ order.deviceName }}</td>
             <td>{{ order.quantity }}</td>
-            <td>{{ order.borrowDate | date: 'MMM d, y' }}</td>
+            <td>{{ order.borrowDate | date: 'dd/MM/yyyy' }}</td>
             <td>
               <span class="status-pill" [ngClass]="getOrderStatusClass(order.status)">
                 {{ getOrderStatusLabel(order.status) }}

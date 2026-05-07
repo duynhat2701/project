@@ -11,6 +11,7 @@ import { catchError, finalize, of, timeout } from 'rxjs';
 import { AuthService } from '../../core/services/auth.service';
 import { DeviceService } from '../../core/services/device.service';
 import { Device } from '../../shared/models/device.model';
+import { getDeviceStatusLabel } from '../../shared/utils/status-label.util';
 
 @Component({
   selector: 'app-device-list',
@@ -34,6 +35,12 @@ export class DeviceListComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly authService = inject(AuthService);
+  protected readonly getDeviceStatusLabel = getDeviceStatusLabel;
+  protected readonly statusOptions = [
+    { value: 'AVAILABLE', label: 'Có sẵn' },
+    { value: 'LOW_STOCK', label: 'Sắp hết' },
+    { value: 'OUT_OF_STOCK', label: 'Hết hàng' },
+  ];
 
   protected devices: Device[] = [];
   protected filteredDevices: Device[] = [];
@@ -68,10 +75,10 @@ export class DeviceListComponent implements OnInit {
           console.error('Load devices error:', err);
           this.errorMessage =
             err?.status === 0
-              ? 'Khong ket noi duoc server.'
+              ? 'Không kết nối được server.'
               : err?.status === 504 || err?.name === 'TimeoutError'
-                ? 'Server dang khoi dong, vui long thu lai sau it giay.'
-                : err?.error?.message || 'Khong tai duoc danh sach thiet bi.';
+                ? 'Server đang khởi động, vui lòng thử lại sau ít giây.'
+                : err?.error?.message || 'Không tải được danh sách thiết bị.';
           return of([] as Device[]);
         }),
         finalize(() => {
@@ -119,14 +126,14 @@ export class DeviceListComponent implements OnInit {
           console.error('Save device error:', err);
           this.errorMessage =
             err?.status === 403
-              ? 'Ban khong co quyen thao tac voi thiet bi.'
+              ? 'Bạn không có quyền thao tác với thiết bị.'
               : err?.status === 401
-                ? 'Phien dang nhap het han. Vui long dang nhap lai.'
+                ? 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.'
                 : err?.status === 0
-                  ? 'Khong ket noi duoc server.'
+                  ? 'Không kết nối được server.'
                   : err?.name === 'TimeoutError'
-                    ? 'Server phan hoi qua cham, vui long thu lai.'
-                    : err?.error?.message || 'Luu thiet bi that bai.';
+                    ? 'Server phản hồi quá chậm, vui lòng thử lại.'
+                    : err?.error?.message || 'Lưu thiết bị thất bại.';
           this.cdr.detectChanges();
         },
       });
@@ -154,7 +161,7 @@ export class DeviceListComponent implements OnInit {
   }
 
   protected deleteDevice(id: number): void {
-    if (!confirm('Ban co chac muon xoa thiet bi nay?')) {
+    if (!confirm('Bạn có chắc muốn xóa thiết bị này?')) {
       return;
     }
 
@@ -176,7 +183,7 @@ export class DeviceListComponent implements OnInit {
         next: () => this.loadData(),
         error: (err) => {
           console.error('Delete device error:', err);
-          this.errorMessage = err?.error?.message || 'Xoa thiet bi that bai.';
+          this.errorMessage = err?.error?.message || 'Xóa thiết bị thất bại.';
           this.cdr.detectChanges();
         },
       });
@@ -191,7 +198,7 @@ export class DeviceListComponent implements OnInit {
     }
 
     this.filteredDevices = this.devices.filter((device) =>
-      [device.name, device.code, device.status].some((value) =>
+      [device.name, device.code, device.status, getDeviceStatusLabel(device.status)].some((value) =>
         value.toLowerCase().includes(keyword),
       ),
     );

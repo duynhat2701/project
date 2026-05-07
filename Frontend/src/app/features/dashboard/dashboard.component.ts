@@ -7,6 +7,7 @@ import { BorrowService } from '../../core/services/borrow.service';
 import { DeviceService } from '../../core/services/device.service';
 import { Borrow } from '../../shared/models/borrow.model';
 import { Device } from '../../shared/models/device.model';
+import { getBorrowStatusLabel, getRoleLabel } from '../../shared/utils/status-label.util';
 
 interface ProductStat {
   id: number;
@@ -15,7 +16,7 @@ interface ProductStat {
   borrowedQuantity: number;
   borrowCount: number;
   rating: number;
-  status: 'Con hang' | 'Sap het' | 'Het hang';
+  status: 'Còn hàng' | 'Sắp hết' | 'Hết hàng';
   accent: string;
 }
 
@@ -46,6 +47,7 @@ export class DashboardComponent implements OnInit {
   private readonly chartColors = ['#10b981', '#f59e0b', '#06b6d4', '#ff5b36', '#8b5cf6', '#0f766e'];
 
   readonly authService = this.auth;
+  readonly getRoleLabel = getRoleLabel;
 
   topProducts: ProductStat[] = [];
   salesCategories: SalesCategory[] = [];
@@ -80,6 +82,10 @@ export class DashboardComponent implements OnInit {
 
     if (normalized === 'CANCELLED' || normalized === 'CANCELED') {
       return 'status-pill-cancel';
+    }
+
+    if (normalized === 'APPROVED') {
+      return 'status-pill-completed';
     }
 
     return `status-pill-${status.toLowerCase().replace(/\s+/g, '-')}`;
@@ -129,10 +135,10 @@ export class DashboardComponent implements OnInit {
           console.error('Load dashboard error:', err);
           this.errorMessage =
             err?.status === 0
-              ? 'Khong ket noi duoc server.'
+              ? 'Không kết nối được server.'
               : err?.status === 504 || err?.name === 'TimeoutError'
-                ? 'Server dang khoi dong, vui long thu lai sau it giay.'
-                : err?.error?.message || 'Khong tai duoc du lieu dashboard.';
+                ? 'Server đang khởi động, vui lòng thử lại sau ít giây.'
+                : err?.error?.message || 'Không tải được dữ liệu tổng quan.';
           return of({ devices: [] as Device[], borrows: [] as Borrow[] });
         }),
         finalize(() => {
@@ -215,37 +221,19 @@ export class DashboardComponent implements OnInit {
   }
 
   getOrderStatusLabel(status: string): string {
-    const normalized = status.toUpperCase();
-
-    if (normalized === 'BORROWING') {
-      return 'Dang muon';
-    }
-
-    if (normalized === 'RETURNED') {
-      return 'Da tra';
-    }
-
-    if (normalized === 'PENDING') {
-      return 'Cho duyet';
-    }
-
-    if (normalized === 'CANCELLED' || normalized === 'CANCELED') {
-      return 'Da huy';
-    }
-
-    return status;
+    return getBorrowStatusLabel(status);
   }
 
   private mapInventoryStatus(quantity: number): ProductStat['status'] {
     if (quantity <= 0) {
-      return 'Het hang';
+      return 'Hết hàng';
     }
 
     if (quantity <= 2) {
-      return 'Sap het';
+      return 'Sắp hết';
     }
 
-    return 'Con hang';
+    return 'Còn hàng';
   }
 
   private buildAccent(index: number): string {
