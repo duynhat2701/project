@@ -1,57 +1,59 @@
 <div class="auth-shell">
-  <section class="auth-hero">
-    <p class="auth-eyebrow">Tạo tài khoản</p>
-    <h1>Tạo người dùng mới cho hệ thống</h1>
-    <p class="auth-copy">
-      Đăng ký tài khoản nhân viên mới để truy cập tổng quan, quản lý thiết bị và theo dõi phiếu mượn trả.
-    </p>
-  </section>
+  <div class="auth-layout">
+    <section class="auth-hero">
+      <p class="auth-eyebrow">Tạo tài khoản</p>
+      <h1>Tạo người dùng mới cho hệ thống</h1>
+      <p class="auth-copy">
+        Đăng ký tài khoản nhân viên mới để truy cập tổng quan, quản lý thiết bị và theo dõi phiếu mượn trả.
+      </p>
+    </section>
 
-  <nz-card class="auth-card" [nzBordered]="false">
-    <div class="auth-card-head">
-      <h2>Đăng ký</h2>
-      <p class="auth-card-copy">Điền đầy đủ thông tin để tạo tài khoản mới.</p>
-    </div>
+    <nz-card class="auth-card" [nzBordered]="false">
+      <div class="auth-card-head">
+        <h2>Đăng ký</h2>
+        <p class="auth-card-copy">Điền đầy đủ thông tin để tạo tài khoản mới.</p>
+      </div>
 
-    <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
-    <nz-alert
-      *ngIf="isSuccess"
-      nzType="success"
-      nzMessage="Đăng ký thành công. Đang chuyển sang trang đăng nhập."
-      nzShowIcon
-    ></nz-alert>
+      <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
+      <nz-alert
+        *ngIf="isSuccess"
+        nzType="success"
+        nzMessage="Đăng ký thành công. Đang chuyển sang trang đăng nhập."
+        nzShowIcon
+      ></nz-alert>
 
-    <form nz-form [formGroup]="registerForm" (ngSubmit)="submit()" class="auth-form">
-      <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Nhập họ tên hợp lệ'">
-          <nz-input-group nzPrefixIcon="user">
-            <input nz-input type="text" formControlName="name" placeholder="Họ và tên" />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+      <form nz-form [formGroup]="registerForm" (ngSubmit)="submit()" class="auth-form">
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'Nhập họ tên hợp lệ'">
+            <nz-input-group nzPrefixIcon="user">
+              <input nz-input type="text" formControlName="name" placeholder="Họ và tên" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
-      <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Email không hợp lệ'">
-          <nz-input-group nzPrefixIcon="mail">
-            <input nz-input type="email" formControlName="email" placeholder="Email" />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'Email không hợp lệ'">
+            <nz-input-group nzPrefixIcon="mail">
+              <input nz-input type="email" formControlName="email" placeholder="Email" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
-      <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
-          <nz-input-group nzPrefixIcon="lock">
-            <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
+            <nz-input-group nzPrefixIcon="lock">
+              <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
-      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Tạo tài khoản</button>
-    </form>
+        <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Tạo tài khoản</button>
+      </form>
 
-    <p class="auth-switch">
-      Đã có tài khoản?
-      <a routerLink="/login">Đăng nhập</a>
-    </p>
-  </nz-card>
+      <p class="auth-switch">
+        Đã có tài khoản?
+        <a routerLink="/login">Đăng nhập</a>
+      </p>
+    </nz-card>
+  </div>
 </div>

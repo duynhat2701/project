@@ -1,43 +1,45 @@
 <div class="auth-shell">
-  <section class="auth-hero">
-    <p class="auth-eyebrow">Device Hub</p>
-    <h1>Đăng nhập hệ thống quản lý thiết bị</h1>
-    <p class="auth-copy">
-      Theo dõi thiết bị, duyệt yêu cầu mượn trả và quản lý danh mục trong một không gian làm việc gọn gàng.
-    </p>
-  </section>
+  <div class="auth-layout">
+    <section class="auth-hero">
+      <p class="auth-eyebrow">Device Hub</p>
+      <h1>Đăng nhập hệ thống quản lý thiết bị</h1>
+      <p class="auth-copy">
+        Theo dõi thiết bị, duyệt yêu cầu mượn trả và quản lý danh mục trong một không gian làm việc gọn gàng.
+      </p>
+    </section>
 
-  <nz-card class="auth-card" [nzBordered]="false">
-    <div class="auth-card-head">
-      <h2>Đăng nhập</h2>
-      <p class="auth-card-copy">Sử dụng tài khoản đã được cấp để truy cập hệ thống.</p>
-    </div>
+    <nz-card class="auth-card" [nzBordered]="false">
+      <div class="auth-card-head">
+        <h2>Đăng nhập</h2>
+        <p class="auth-card-copy">Sử dụng tài khoản đã được cấp để truy cập hệ thống.</p>
+      </div>
 
-    <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
+      <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
 
-    <form nz-form [formGroup]="loginForm" (ngSubmit)="submit()" class="auth-form">
-      <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Email không hợp lệ'">
-          <nz-input-group nzPrefixIcon="mail">
-            <input nz-input type="email" formControlName="email" placeholder="Email" />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+      <form nz-form [formGroup]="loginForm" (ngSubmit)="submit()" class="auth-form">
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'Email không hợp lệ'">
+            <nz-input-group nzPrefixIcon="mail">
+              <input nz-input type="email" formControlName="email" placeholder="Email" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
-      <nz-form-item>
-        <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
-          <nz-input-group nzPrefixIcon="lock">
-            <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+        <nz-form-item>
+          <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
+            <nz-input-group nzPrefixIcon="lock">
+              <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
 
-      <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Đăng nhập</button>
-    </form>
+        <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Đăng nhập</button>
+      </form>
 
-    <p class="auth-switch">
-      Chưa có tài khoản?
-      <a routerLink="/register">Đăng ký ngay</a>
-    </p>
-  </nz-card>
+      <p class="auth-switch">
+        Chưa có tài khoản?
+        <a routerLink="/register">Đăng ký ngay</a>
+      </p>
+    </nz-card>
+  </div>
 </div>
