@@ -32,6 +32,9 @@
         <input nz-input class="surface-field" formControlName="name" placeholder="Tên thiết bị" />
         <input nz-input class="surface-field" formControlName="code" placeholder="Mã thiết bị" />
         <input nz-input class="surface-field" type="number" formControlName="quantity" placeholder="Số lượng" />
+        <select class="surface-select" formControlName="status">
+          <option *ngFor="let option of statusOptions" [ngValue]="option.value">{{ option.label }}</option>
+        </select>
       </div>
 
       <div class="surface-actions">
