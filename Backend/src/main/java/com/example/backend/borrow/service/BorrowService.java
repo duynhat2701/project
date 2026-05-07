@@ -103,6 +103,8 @@ public class BorrowService {
     private void syncDeviceStatus(Device device) {
         if (device.getQuantity() <= 0) {
             device.setStatus("OUT_OF_STOCK");
+        } else if (device.getQuantity() <= 3) {
+            device.setStatus("LOW_STOCK");
         } else {
             device.setStatus("AVAILABLE");
         }

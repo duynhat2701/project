@@ -56,7 +56,6 @@ export class DeviceListComponent implements OnInit {
     name: ['', [Validators.required]],
     code: ['', [Validators.required]],
     quantity: [0, [Validators.required, Validators.min(0)]],
-    status: ['AVAILABLE', [Validators.required]],
   });
 
   ngOnInit(): void {
@@ -141,7 +140,7 @@ export class DeviceListComponent implements OnInit {
       name: device.name,
       code: device.code,
       quantity: device.quantity,
-      status: device.status,
+
     });
     this.cdr.detectChanges();
   }
@@ -222,7 +221,7 @@ export class DeviceListComponent implements OnInit {
       name: '',
       code: '',
       quantity: 0,
-      status: 'AVAILABLE',
+
     });
   }
 }

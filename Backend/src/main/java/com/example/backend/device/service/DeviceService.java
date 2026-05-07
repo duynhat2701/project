@@ -58,7 +58,16 @@ public class DeviceService {
         device.setName(dto.getName());
         device.setCode(dto.getCode());
         device.setQuantity(dto.getQuantity());
-        device.setStatus(dto.getStatus());
+        syncDeviceStatus(device);
+    }
+    private void syncDeviceStatus(Device device) {
+        if (device.getQuantity() <= 0) {
+            device.setStatus("OUT_OF_STOCK");
+        } else if (device.getQuantity() <= 3) {
+            device.setStatus("LOW_STOCK");
+        } else {
+            device.setStatus("AVAILABLE");
+        }
     }
 
     private DeviceResponse toResponse(Device device) {

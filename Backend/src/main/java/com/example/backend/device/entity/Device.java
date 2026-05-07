@@ -21,5 +21,5 @@ public class Device {
     private String name;
     private String code;
     private int quantity;
-    private String status; // AVAILABLE, OUT_OF_STOCK
+    private String status; // AVAILABLE, LOW_STOCK, OUT_OF_STOCK
 }
