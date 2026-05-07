@@ -4,6 +4,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background:
+    radial-gradient(circle at 12% 82%, rgba(187, 247, 208, 0.5), transparent 18%),
+    radial-gradient(circle at 78% 18%, rgba(191, 219, 254, 0.45), transparent 20%),
+    linear-gradient(180deg, #edf4fb 0%, #f4f8fc 100%);
 }
 
 .auth-layout {
@@ -21,26 +25,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at left bottom, rgba(16, 185, 129, 0.12), transparent 24%),
-    radial-gradient(circle at right top, rgba(59, 130, 246, 0.12), transparent 22%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(248, 250, 252, 0.72));
-  border: 1px solid rgba(226, 232, 240, 0.9);
-}
-
-.auth-eyebrow {
-  margin: 0 0 18px;
-  color: #2563eb;
-  font-size: 0.8rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
 }
 
 .auth-hero h1 {
   margin: 0 0 18px;
-  max-width: 12ch;
-  font-size: clamp(3rem, 5vw, 4.6rem);
+  font-size: clamp(3rem, 5vw, 3.8rem);
   line-height: 0.98;
   font-weight: 800;
   color: #0f172a;
@@ -48,7 +37,6 @@
 
 .auth-copy {
   margin: 0;
-  max-width: 24ch;
   font-size: 1rem;
   line-height: 1.7;
   color: #475569;
@@ -58,6 +46,7 @@
   padding: 28px 28px 24px;
   border-radius: 28px;
   border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 22px 52px rgba(15, 23, 42, 0.1);
 }
 
@@ -104,7 +93,7 @@
 
   .auth-hero {
     min-height: auto;
-    padding: 36px 30px;
+    padding: 24px 12px 8px;
   }
 
   .auth-hero h1,
