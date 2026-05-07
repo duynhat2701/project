@@ -1,24 +1,39 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-import { BorrowListComponent } from './features/borrow/borrow-list.component';
-import { LoginComponent } from './features/auth/login/login.component';
-import { RegisterComponent } from './features/auth/register/register.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
-import { DeviceListComponent } from './features/device/device-list.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/login/login.component').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/auth/register/register.component').then((m) => m.RegisterComponent),
+  },
   {
     path: '',
     component: MainLayoutComponent,
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'devices', component: DeviceListComponent },
-      { path: 'borrow', component: BorrowListComponent },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+      },
+      {
+        path: 'devices',
+        loadComponent: () =>
+          import('./features/device/device-list.component').then((m) => m.DeviceListComponent),
+      },
+      {
+        path: 'borrow',
+        loadComponent: () =>
+          import('./features/borrow/borrow-list.component').then((m) => m.BorrowListComponent),
+      },
     ],
   },
   { path: '**', redirectTo: '' },
