@@ -12,7 +12,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import jakarta.transaction.Transactional;
 @Service
 public class RequestService {
 
@@ -62,6 +62,27 @@ public class RequestService {
                 .map(this::toResponse)
                 .toList();
     }
+    @Transactional
+    public RequestResponse reject(Long id) {
+        BorrowRequest request = requestRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Request not found"
+                ));
+
+        if (!"PENDING".equalsIgnoreCase(request.getStatus())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Only pending request can be rejected"
+            );
+        }
+
+        request.setStatus("REJECTED");
+
+        BorrowRequest savedRequest = requestRepository.save(request);
+
+        return toResponse(savedRequest);
+    }
 
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -79,4 +100,5 @@ public class RequestService {
                 request.getStatus()
         );
     }
+
 }

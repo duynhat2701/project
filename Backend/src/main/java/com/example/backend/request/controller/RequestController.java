@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.PathVariable;
 @RestController
 @RequestMapping("/api/requests")
 public class RequestController {
@@ -48,6 +48,13 @@ public class RequestController {
         return ApiResponse.success(
                 "My requests fetched successfully",
                 requestService.getMy(authentication.getName())
+        );
+    }
+    @PostMapping("/reject/{id}")
+    public ApiResponse<RequestResponse> reject(@PathVariable Long id) {
+        return ApiResponse.success(
+                "Request rejected successfully",
+                requestService.reject(id)
         );
     }
 }
