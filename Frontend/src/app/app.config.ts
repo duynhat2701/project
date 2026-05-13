@@ -2,7 +2,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
-
+import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { routes } from './app.routes';
 import { icons } from './icons-provider';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
@@ -19,5 +19,11 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideNzIcons(icons),
     provideNzI18n(vi_VN),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,
+        errorInterceptor,
+      ])
+    )
   ],
 };

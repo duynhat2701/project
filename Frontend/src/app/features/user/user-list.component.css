@@ -1,0 +1,37 @@
+.user-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.user-table-card,
+.user-form-card {
+  padding: 0;
+}
+
+.user-card-head {
+  padding: 4px 0 0;
+}
+
+.user-card-head p {
+  margin: 6px 0 0;
+}
+
+.user-form {
+  margin-top: 18px;
+}
+
+.user-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.user-name strong {
+  font-size: 0.96rem;
+}
+
+.user-meta {
+  color: #64748b;
+  font-size: 0.82rem;
+}

@@ -1,0 +1,115 @@
+<section class="page-shell user-page">
+  <div *ngIf="errorMessage" class="feedback-banner feedback-banner-error">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="feedback-banner feedback-banner-success">
+    {{ successMessage }}
+  </div>
+
+  <nz-card class="section-card user-table-card" [nzBordered]="false">
+    <div class="toolbar-row">
+      <div>
+        <h2 class="page-title">Quản lý người dùng</h2>
+        <p class="page-subtitle">Thêm, cập nhật tài khoản và phân quyền người dùng trong hệ thống.</p>
+      </div>
+
+      <div class="toolbar-search">
+        <input
+          nz-input
+          [ngModel]="searchKeyword"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Tìm theo tên, email hoặc vai trò"
+        />
+      </div>
+    </div>
+  </nz-card>
+
+  <nz-card class="section-card user-form-card" [nzBordered]="false">
+    <div class="user-card-head">
+      <h3 class="page-title">{{ editingUserId ? 'Cập nhật người dùng' : 'Thêm người dùng mới' }}</h3>
+      <p class="page-subtitle">
+        {{ editingUserId ? 'Có thể đổi tên, email, mật khẩu và vai trò.' : 'Tạo tài khoản mới cho nhân viên hoặc quản trị viên.' }}
+      </p>
+    </div>
+
+    <form nz-form [formGroup]="form" (ngSubmit)="submit()" class="surface-form user-form">
+      <div class="surface-form-grid">
+        <input nz-input class="surface-field" formControlName="name" placeholder="Họ và tên" />
+        <input nz-input class="surface-field" formControlName="email" placeholder="Email" />
+        <input
+          nz-input
+          class="surface-field"
+          type="password"
+          formControlName="password"
+          [placeholder]="editingUserId ? 'Mật khẩu mới, bỏ trống nếu không đổi' : 'Mật khẩu'"
+        />
+
+        <select class="surface-select" formControlName="role">
+          <option *ngFor="let option of roleOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+
+      <div class="surface-actions">
+        <button nz-button nzType="primary" [nzLoading]="submitting">
+          {{ editingUserId ? 'Lưu thay đổi' : 'Thêm người dùng' }}
+        </button>
+
+        <button *ngIf="editingUserId" type="button" nz-button nzType="default" (click)="cancelEdit()">
+          Hủy
+        </button>
+      </div>
+    </form>
+  </nz-card>
+
+  <nz-card class="section-card user-table-card" [nzBordered]="false">
+    <nz-table
+      #userTable
+      class="table-primary"
+      [nzData]="filteredUsers"
+      [nzLoading]="loading"
+      [nzBordered]="false"
+      [nzPageSize]="5"
+      [nzShowPagination]="true"
+    >
+      <thead>
+      <tr>
+        <th>Người dùng</th>
+        <th>Email</th>
+        <th>Vai trò</th>
+        <th>Thao tác</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      <tr *ngFor="let user of userTable.data">
+        <td>
+          <div class="user-name">
+            <strong>{{ user.name }}</strong>
+            <span class="user-meta">ID: {{ user.id }}</span>
+          </div>
+        </td>
+
+        <td>{{ user.email }}</td>
+
+        <td>
+            <span [class]="getRoleClass(user.role)">
+              {{ getRoleLabel(user.role) }}
+            </span>
+        </td>
+
+        <td>
+          <div class="table-actions">
+
+            <button nz-button nzType="default" (click)="startEdit(user)">Cập nhật</button>
+            <button nz-button nzDanger (click)="deleteUser(user.id)">Xóa</button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</section>
+

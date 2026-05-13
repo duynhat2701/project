@@ -4,34 +4,45 @@ import { map, Observable } from 'rxjs';
 import { Borrow } from '../../shared/models/borrow.model';
 import { ApiResponse } from '../../shared/models/api-response.model';
 import { environment } from '../../../environments/environment';
+import { BaseApiService } from './base-api.service';
 
 @Injectable({ providedIn: 'root' })
-export class BorrowService {
+export class BorrowService extends BaseApiService {
   private readonly api = `${environment.apiBaseUrl}/borrows`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    super();
+  }
 
   getAll(): Observable<Borrow[]> {
-    return this.http.get<ApiResponse<Borrow[]>>(this.api).pipe(
-      map((response) => response.data),
+    return this.handleRequest(
+      this.http.get<ApiResponse<Borrow[]>>(this.api).pipe(
+        map((response) => response.data),
+      ),
     );
   }
 
   getMy(): Observable<Borrow[]> {
-    return this.http.get<ApiResponse<Borrow[]>>(`${this.api}/my`).pipe(
-      map((response) => response.data),
+    return this.handleRequest(
+      this.http.get<ApiResponse<Borrow[]>>(`${this.api}/my`).pipe(
+        map((response) => response.data),
+      ),
     );
   }
 
   approve(requestId: number): Observable<Borrow> {
-    return this.http.post<ApiResponse<Borrow>>(`${this.api}/approve/${requestId}`, {}).pipe(
-      map((response) => response.data),
+    return this.handleRequest(
+      this.http.post<ApiResponse<Borrow>>(`${this.api}/approve/${requestId}`, {}).pipe(
+        map((response) => response.data),
+      ),
     );
   }
 
   returnDevice(borrowId: number): Observable<Borrow> {
-    return this.http.post<ApiResponse<Borrow>>(`${this.api}/return/${borrowId}`, {}).pipe(
-      map((response) => response.data),
+    return this.handleRequest(
+      this.http.post<ApiResponse<Borrow>>(`${this.api}/return/${borrowId}`, {}).pipe(
+        map((response) => response.data),
+      ),
     );
   }
 }

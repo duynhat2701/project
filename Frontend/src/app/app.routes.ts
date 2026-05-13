@@ -34,6 +34,12 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/borrow/borrow-list.component').then((m) => m.BorrowListComponent),
       },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/user/user-list.component').then((m) => m.UserListComponent),
+
+      }
     ],
   },
   { path: '**', redirectTo: '' },

@@ -49,7 +49,15 @@
   </nz-card>
 
   <nz-card class="section-card device-table-card" [nzBordered]="false">
-    <nz-table class="table-primary" [nzData]="filteredDevices" [nzLoading]="loading" [nzBordered]="false">
+    <nz-table
+      #deviceTable
+      class="table-primary"
+      [nzData]="filteredDevices"
+      [nzLoading]="loading"
+      [nzBordered]="false"
+      [nzPageSize]="5"
+      [nzShowPagination]="true"
+    >
       <thead>
         <tr>
           <th>Thiết bị</th>
@@ -61,7 +69,7 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let d of filteredDevices">
+      <tr *ngFor="let d of deviceTable.data">
           <td>
             <div class="device-name">
               <strong>{{ d.name }}</strong>

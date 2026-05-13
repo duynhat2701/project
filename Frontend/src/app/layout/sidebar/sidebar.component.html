@@ -22,6 +22,10 @@
       <span nz-icon nzType="form"></span>
       <span>Mượn / Trả</span>
     </li>
+    <li *ngIf="authService.isAdmin()" nz-menu-item routerLink="/users" routerLinkActive="ant-menu-item-selected">
+      <span nz-icon nzType="team"></span>
+      <span>Người dùng</span>
+    </li>
   </ul>
 
   <button

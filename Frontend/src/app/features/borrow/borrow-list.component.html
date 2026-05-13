@@ -107,7 +107,15 @@
         <p class="page-subtitle">Kiểm tra yêu cầu mới và xử lý các phiếu đang chờ.</p>
       </div>
 
-      <nz-table class="table-primary" [nzData]="requests" [nzLoading]="loadingRequests" [nzBordered]="false">
+      <nz-table
+        #requestTable
+        class="table-primary"
+        [nzData]="requests"
+        [nzLoading]="loadingRequests"
+        [nzBordered]="false"
+        [nzPageSize]="5"
+        [nzShowPagination]="true"
+      >
         <thead>
           <tr>
             <th>Người mượn</th>
@@ -118,7 +126,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let r of requests">
+        <tr *ngFor="let r of requestTable.data">
             <td>
               <div class="borrow-user">
                 <strong>{{ r.userName }}</strong>
@@ -135,6 +143,11 @@
                 <button nz-button nzType="primary" *ngIf="r.status === 'PENDING'" (click)="approveRequest(r.id)">
                   Duyệt
                 </button>
+
+                <button nz-button nzDanger *ngIf="r.status === 'PENDING'" (click)="rejectRequest(r.id)">
+                  Từ chối
+                </button>
+
                 <span class="muted-note" *ngIf="r.status !== 'PENDING'">Đã xử lý</span>
               </div>
             </td>
@@ -149,7 +162,15 @@
         <p class="page-subtitle">Theo dõi thiết bị đang được sử dụng và các phiếu đã hoàn tất.</p>
       </div>
 
-      <nz-table class="table-primary" [nzData]="borrows" [nzLoading]="loadingBorrows" [nzBordered]="false">
+      <nz-table
+        #borrowTable
+        class="table-primary"
+        [nzData]="borrows"
+        [nzLoading]="loadingBorrows"
+        [nzBordered]="false"
+        [nzPageSize]="5"
+        [nzShowPagination]="true"
+      >
         <thead>
           <tr>
             <th>Người mượn</th>
@@ -162,7 +183,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let b of borrows">
+        <tr *ngFor="let b of borrowTable.data">
             <td>
               <div class="borrow-user">
                 <strong>{{ b.userName }}</strong>

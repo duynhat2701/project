@@ -84,7 +84,7 @@ export class DeviceListComponent implements OnInit {
         }),
       )
       .subscribe((devices) => {
-        this.devices = [...devices];
+        this.devices = [...devices].sort((a, b) => b.id - a.id);
         this.applySearch();
         this.cdr.detectChanges();
       });

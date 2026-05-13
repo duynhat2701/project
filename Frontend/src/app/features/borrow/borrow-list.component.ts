@@ -215,7 +215,41 @@ export class BorrowListComponent implements OnInit {
 
     return 'status-chip';
   }
+  protected rejectRequest(id: number): void {
+    if (!confirm('Bạn có chắc muốn từ chối yêu cầu này?')) {
+      return;
+    }
 
+    this.errorMessage = '';
+    this.successMessage = '';
+    this.loadingRequests = true;
+    this.cdr.detectChanges();
+
+    this.requestService
+      .reject(id)
+      .pipe(
+        timeout(15000),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.loadingRequests = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Từ chối yêu cầu thành công.';
+          this.loadData();
+        },
+        error: (error) => {
+          console.error('Reject request error:', error);
+          this.errorMessage = getActionErrorMessage(error, {
+            forbiddenMessage: 'Bạn không có quyền từ chối yêu cầu.',
+            fallbackMessage: 'Từ chối yêu cầu thất bại.',
+          });
+          this.cdr.detectChanges();
+        },
+      });
+  }
   private loadDevices(): void {
     this.deviceService
       .getAll()
@@ -254,7 +288,7 @@ export class BorrowListComponent implements OnInit {
         }),
       )
       .subscribe((requests) => {
-        this.requests = [...requests];
+        this.requests = [...requests].sort((a, b) => b.id - a.id);
         this.cdr.detectChanges();
       });
   }
@@ -279,7 +313,11 @@ export class BorrowListComponent implements OnInit {
         }),
       )
       .subscribe((borrows) => {
-        this.borrows = [...borrows];
+        this.borrows = [...borrows].sort(
+          (a, b) =>
+            new Date(b.borrowDate).getTime() -
+            new Date(a.borrowDate).getTime()
+        );
         this.cdr.detectChanges();
       });
   }

@@ -13,7 +13,7 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
-  role: 'EMPLOYEE';
+  role: 'EMPLOYEE' | 'ADMIN';
 }
 
 export interface LoginResponse {
