@@ -1,5 +1,6 @@
 package com.example.backend.device.service;
 
+import com.example.backend.borrow.repository.BorrowRepository;
 import com.example.backend.device.dto.DeviceDTO;
 import com.example.backend.device.dto.DeviceResponse;
 import com.example.backend.device.entity.Device;
@@ -14,9 +15,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class DeviceService {
 
     private final DeviceRepository deviceRepository;
+    private final BorrowRepository borrowRepository;
 
-    public DeviceService(DeviceRepository deviceRepository) {
+    public DeviceService(DeviceRepository deviceRepository, BorrowRepository borrowRepository) {
         this.deviceRepository = deviceRepository;
+        this.borrowRepository = borrowRepository;
     }
 
     public List<DeviceResponse> getAll() {
@@ -62,11 +65,17 @@ public class DeviceService {
     }
 
     private DeviceResponse toResponse(Device device) {
+        int remainingQuantity = device.getQuantity();
+        int borrowedQuantity = borrowRepository.getBorrowedQuantityByDeviceId(device.getId());
+        int totalQuantity = remainingQuantity + borrowedQuantity;
+
         return new DeviceResponse(
                 device.getId(),
                 device.getName(),
                 device.getCode(),
-                device.getQuantity(),
+                remainingQuantity,
+                totalQuantity,
+                borrowedQuantity,
                 device.getStatus()
         );
     }
