@@ -13,7 +13,6 @@ export interface RegisterPayload {
   name: string;
   email: string;
   password: string;
-  role: 'EMPLOYEE' | 'ADMIN';
 }
 
 export interface LoginResponse {
@@ -30,6 +29,11 @@ export interface UserResponse {
   name: string;
   email: string;
   role: string;
+}
+
+export interface VerifyOtpPayload {
+  email: string;
+  otp: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -52,7 +56,13 @@ export class AuthService {
   }
 
   register(data: RegisterPayload): Observable<UserResponse> {
-    return this.http.post<ApiResponse<UserResponse>>(`${this.baseUrl}/users`, data).pipe(
+    return this.http.post<ApiResponse<UserResponse>>(`${this.baseUrl}/auth/register`, data).pipe(
+      map((response) => response.data),
+    );
+  }
+
+  verifyRegistrationOtp(data: VerifyOtpPayload): Observable<void> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/auth/verify-otp`, data).pipe(
       map((response) => response.data),
     );
   }

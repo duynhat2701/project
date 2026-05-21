@@ -1,37 +1,44 @@
 <div class="auth-shell">
   <div class="auth-layout">
     <section class="auth-hero">
-      <h1>Tạo tài khoản mới cho hệ thống</h1>
+      <h1>Tao tai khoan moi cho he thong</h1>
       <p class="auth-copy">
-        Đăng ký người dùng mới để truy cập tổng quát, quản lý thiết bị và phiếu mượn trả.
+        Dang ky nguoi dung moi de truy cap tong quat, quan ly thiet bi va phieu muon tra.
       </p>
     </section>
 
     <nz-card class="auth-card" [nzBordered]="false">
       <div class="auth-card-head">
-        <h2>Đăng ký</h2>
-        <p class="auth-card-copy">Điền đầy đủ thông tin để tạo tài khoản mới.</p>
+        <h2>{{ currentStep === 'register' ? 'Dang ky' : 'Xac thuc OTP' }}</h2>
+        <p class="auth-card-copy">
+          {{
+            currentStep === 'register'
+              ? 'Nhap thong tin tai khoan. He thong se gui ma OTP ve email de kich hoat.'
+              : 'Nhap ma OTP da gui toi email de kich hoat tai khoan.'
+          }}
+        </p>
       </div>
 
       <nz-alert *ngIf="errorMessage" nzType="error" [nzMessage]="errorMessage" nzShowIcon></nz-alert>
-      <nz-alert
-        *ngIf="isSuccess"
-        nzType="success"
-        nzMessage="Đăng ký thành công. Đang chuyển sang trang đăng nhập."
-        nzShowIcon
-      ></nz-alert>
+      <nz-alert *ngIf="successMessage" nzType="success" [nzMessage]="successMessage" nzShowIcon></nz-alert>
 
-      <form nz-form [formGroup]="registerForm" (ngSubmit)="submit()" class="auth-form">
+      <form
+        *ngIf="currentStep === 'register'; else verifyStep"
+        nz-form
+        [formGroup]="registerForm"
+        (ngSubmit)="submitRegister()"
+        class="auth-form"
+      >
         <nz-form-item>
-          <nz-form-control [nzErrorTip]="'Nhập họ tên hợp lệ'">
+          <nz-form-control [nzErrorTip]="'Nhap ho ten hop le'">
             <nz-input-group nzPrefixIcon="user">
-              <input nz-input type="text" formControlName="name" placeholder="Họ và tên" />
+              <input nz-input type="text" formControlName="name" placeholder="Ho va ten" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
 
         <nz-form-item>
-          <nz-form-control [nzErrorTip]="'Email không hợp lệ'">
+          <nz-form-control [nzErrorTip]="'Email phai dung dinh dang @gmail.com'">
             <nz-input-group nzPrefixIcon="mail">
               <input nz-input type="email" formControlName="email" placeholder="Email" />
             </nz-input-group>
@@ -39,19 +46,45 @@
         </nz-form-item>
 
         <nz-form-item>
-          <nz-form-control [nzErrorTip]="'Mật khẩu tối thiểu 6 ký tự'">
+          <nz-form-control [nzErrorTip]="'Mat khau toi thieu 6 ky tu'">
             <nz-input-group nzPrefixIcon="lock">
-              <input nz-input type="password" formControlName="password" placeholder="Mật khẩu" />
+              <input nz-input type="password" formControlName="password" placeholder="Mat khau" />
             </nz-input-group>
           </nz-form-control>
         </nz-form-item>
 
-        <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">Tạo tài khoản</button>
+        <button nz-button nzType="primary" nzBlock [nzLoading]="isSubmitting" class="auth-submit">
+          Tao tai khoan
+        </button>
       </form>
 
+      <ng-template #verifyStep>
+        <div class="verification-hint">
+          Ma xac thuc da duoc gui toi <strong>{{ verificationEmail }}</strong>.
+        </div>
+
+        <form nz-form [formGroup]="otpForm" (ngSubmit)="submitOtp()" class="auth-form">
+          <nz-form-item>
+            <nz-form-control [nzErrorTip]="'OTP gom 6 chu so'">
+              <nz-input-group nzPrefixIcon="safety-certificate">
+                <input nz-input type="text" formControlName="otp" placeholder="Nhap OTP 6 chu so" maxlength="6" />
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+
+          <button nz-button nzType="primary" nzBlock [nzLoading]="isVerifying" class="auth-submit">
+            Kich hoat tai khoan
+          </button>
+        </form>
+
+        <div class="otp-actions">
+          <button nz-button nzType="link" type="button" (click)="backToRegister()">Sua thong tin dang ky</button>
+        </div>
+      </ng-template>
+
       <p class="auth-switch">
-        Đã có tài khoản?
-        <a routerLink="/login">Đăng nhập</a>
+        Da co tai khoan?
+        <a routerLink="/login">Dang nhap</a>
       </p>
     </nz-card>
   </div>

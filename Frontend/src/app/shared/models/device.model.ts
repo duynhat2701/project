@@ -3,5 +3,6 @@ export interface Device {
   name: string;
   code: string;
   quantity: number;
+  totalQuantity?: number;
   status: string;
 }

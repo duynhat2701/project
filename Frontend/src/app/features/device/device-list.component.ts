@@ -174,10 +174,24 @@ export class DeviceListComponent implements OnInit {
         next: () => this.loadData(),
         error: (error) => {
           console.error('Delete device error:', error);
-          this.errorMessage = getActionErrorMessage(error, {
-            forbiddenMessage: 'Bạn không có quyền xóa thiết bị.',
-            fallbackMessage: 'Xóa thiết bị thất bại.',
-          });
+
+          const backendMessage = error?.error?.message || '';
+
+          if (
+            error?.status === 500 ||
+            error?.status === 409 ||
+            backendMessage.toLowerCase().includes('constraint') ||
+            backendMessage.toLowerCase().includes('foreign key') ||
+            backendMessage.toLowerCase().includes('borrow')
+          ) {
+            this.errorMessage = 'Thiết bị đang được mượn, không thể xóa.';
+          } else {
+            this.errorMessage = getActionErrorMessage(error, {
+              forbiddenMessage: 'Bạn không có quyền xóa thiết bị.',
+              fallbackMessage: 'Xóa thiết bị thất bại.',
+            });
+          }
+
           this.cdr.detectChanges();
         },
       });
@@ -199,6 +213,10 @@ export class DeviceListComponent implements OnInit {
     }
 
     return 'status-chip';
+  }
+
+  protected getTotalQuantity(device: Device): number {
+    return device.totalQuantity ?? device.quantity;
   }
 
   private applySearch(): void {

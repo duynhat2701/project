@@ -85,6 +85,19 @@
   color: #475569;
 }
 
+.verification-hint {
+  margin-top: 18px;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.otp-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 1100px) {
   .auth-layout {
     grid-template-columns: 1fr;
@@ -94,5 +107,9 @@
   .auth-hero {
     min-height: auto;
     padding: 24px 12px 8px;
+  }
+
+  .otp-actions {
+    flex-direction: column;
   }
 }

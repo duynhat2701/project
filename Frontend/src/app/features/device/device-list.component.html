@@ -63,13 +63,14 @@
           <th>Thiết bị</th>
           <th>Mã</th>
           <th>Số lượng</th>
+          <th>Còn lại</th>
           <th>Trạng thái</th>
           <th *ngIf="authService.isAdmin()">Thao tác</th>
         </tr>
       </thead>
 
       <tbody>
-      <tr *ngFor="let d of deviceTable.data">
+        <tr *ngFor="let d of deviceTable.data">
           <td>
             <div class="device-name">
               <strong>{{ d.name }}</strong>
@@ -77,6 +78,7 @@
             </div>
           </td>
           <td><span class="device-meta">{{ d.code }}</span></td>
+          <td><span class="device-quantity">{{ getTotalQuantity(d) }}</span></td>
           <td><span class="device-quantity">{{ d.quantity }}</span></td>
           <td>
             <span [class]="getStatusClass(d.status)">
