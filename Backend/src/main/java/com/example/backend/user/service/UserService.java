@@ -34,6 +34,10 @@ public class UserService {
     }
 
     public UserResponse create(UserDTO dto) {
+        return create(dto, true);
+    }
+
+    public UserResponse create(UserDTO dto, boolean status) {
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
@@ -44,6 +48,7 @@ public class UserService {
 
         User user = new User();
         applyChanges(user, dto, true);
+        user.setStatus(status);
         return toResponse(userRepository.save(user));
     }
 
@@ -111,7 +116,8 @@ public class UserService {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                user.getRole()
+                user.getRole(),
+                user.isStatus()
         );
     }
 }

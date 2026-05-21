@@ -6,7 +6,6 @@ public record DeviceResponse(
         String code,
         int quantity,
         int totalQuantity,
-        int borrowedQuantity,
         String status
 ) {
 }

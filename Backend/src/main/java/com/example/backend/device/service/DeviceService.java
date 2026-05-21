@@ -75,7 +75,6 @@ public class DeviceService {
                 device.getCode(),
                 remainingQuantity,
                 totalQuantity,
-                borrowedQuantity,
                 device.getStatus()
         );
     }

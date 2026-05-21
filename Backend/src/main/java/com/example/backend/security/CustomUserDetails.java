@@ -14,6 +14,7 @@ public class CustomUserDetails implements UserDetails {
     private final String email;
     private final String password;
     private final String role;
+    private final boolean status;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
@@ -21,6 +22,7 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.role = user.getRole();
+        this.status = user.isStatus();
     }
 
     public Long getId() {
@@ -48,5 +50,10 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return status;
     }
 }
