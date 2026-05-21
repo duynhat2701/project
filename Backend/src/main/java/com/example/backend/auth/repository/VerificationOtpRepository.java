@@ -8,5 +8,7 @@ public interface VerificationOtpRepository extends JpaRepository<VerificationOtp
 
     Optional<VerificationOtp> findTopByUserEmailAndOtpOrderByIdDesc(String email, String otp);
 
+    boolean existsByUserId(Long userId);
+
     void deleteByUserId(Long userId);
 }
