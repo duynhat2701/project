@@ -20,6 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     ) {
         this.userRepository = userRepository;
         this.verificationOtpRepository = verificationOtpRepository;
+
     }
 
     @Override

@@ -1,5 +1,4 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
@@ -11,7 +10,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 import { getActionErrorMessage } from '../../../shared/utils/http-error.util';
-
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -33,6 +32,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   protected currentStep: 'register' | 'verify' = 'register';
   protected isSubmitting = false;
@@ -43,7 +43,7 @@ export class RegisterComponent {
 
   protected registerForm = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    email: ['', [Validators.required, Validators.email, Validators.pattern(/^[A-Za-z0-9._%+-]+@gmail\.com$/)]],
+    email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
@@ -76,6 +76,7 @@ export class RegisterComponent {
           this.currentStep = 'verify';
           this.otpForm.reset({ otp: '' });
           this.successMessage = 'Tai khoan da duoc tao. Kiem tra email va nhap ma OTP de kich hoat.';
+          this.cdr.detectChanges();
         },
         error: (error) => {
           this.errorMessage = getActionErrorMessage(error, {

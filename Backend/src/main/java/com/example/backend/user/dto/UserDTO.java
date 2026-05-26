@@ -16,7 +16,6 @@ public class UserDTO {
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email is invalid")
-    @Pattern(regexp = "(?i)^[A-Z0-9._%+-]+@gmail\\.com$", message = "Email must end with @gmail.com")
     private String email;
 
     @Size(min = 6, message = "Password must be at least 6 characters")

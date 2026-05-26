@@ -45,4 +45,10 @@ public class AuthController {
         authService.verifyOtp(request);
         return ApiResponse.success("Account verified successfully", null);
     }
+
+    @PostMapping("/resend-otp")
+    public ApiResponse<Void> resendOtp(@RequestBody VerifyOtpRequest request) {
+        authService.resendOtp(request.getEmail());
+        return ApiResponse.success("OTP resent successfully", null);
+    }
 }
