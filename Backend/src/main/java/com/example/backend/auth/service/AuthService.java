@@ -95,11 +95,18 @@ public class AuthService {
           verificationOtp.setExpiresAt(LocalDateTime.now().plusMinutes(OTP_EXPIRE_MINUTES));
           verificationOtpRepository.save(verificationOtp);
 
-          emailService.sendOtpEmail(user.getEmail(), otp);
+          try {
+              emailService.sendOtpEmail(user.getEmail(), otp);
+          } catch (Exception e) {
+              log.error("Send mail failed", e);
+          }
           return userResponse;
       } catch (Exception e) {
-          log.info("[DEBUG] Register fail: {}", e.getMessage());
-          throw new RuntimeException(e);
+          log.error("Register fail", e);
+          throw new ResponseStatusException(
+                  HttpStatus.INTERNAL_SERVER_ERROR,
+                  "Không thể đăng ký. Vui lòng thử lại."
+          );
       }
     }
 
