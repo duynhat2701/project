@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -21,7 +21,7 @@ import { getBorrowStatusLabel } from '../../shared/utils/status-label.util';
 @Component({
   selector: 'app-borrow-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzTableModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NzButtonModule, NzCardModule, NzFormModule, NzInputModule, NzTableModule],
   templateUrl: './borrow-list.component.html',
   styleUrl: './borrow-list.component.css',
 })
@@ -39,6 +39,11 @@ export class BorrowListComponent implements OnInit {
   protected devices: Device[] = [];
   protected requests: RequestItem[] = [];
   protected borrows: Borrow[] = [];
+  protected filteredBorrows: Borrow[] = [];
+  protected borrowSearch = {
+    keyword: '',
+    borrowDate: '',
+  };
 
   protected loadingRequests = false;
   protected loadingBorrows = false;
@@ -194,6 +199,10 @@ export class BorrowListComponent implements OnInit {
       });
   }
 
+  protected onBorrowSearchChange(): void {
+    this.applyBorrowSearch();
+  }
+
   protected getStatusClass(status: string): string {
     const normalized = status.toUpperCase();
 
@@ -318,7 +327,24 @@ export class BorrowListComponent implements OnInit {
             new Date(b.borrowDate).getTime() -
             new Date(a.borrowDate).getTime()
         );
+        this.applyBorrowSearch();
         this.cdr.detectChanges();
       });
+  }
+
+  private applyBorrowSearch(): void {
+    const keyword = this.borrowSearch.keyword.trim().toLowerCase();
+    const borrowDate = this.borrowSearch.borrowDate.trim();
+
+    this.filteredBorrows = this.borrows.filter((borrow) => {
+      const matchesKeyword =
+        !keyword ||
+        [borrow.userName, borrow.deviceName].some((value) =>
+          value.toLowerCase().includes(keyword),
+        );
+      const matchesDate = !borrowDate || borrow.borrowDate.includes(borrowDate);
+
+      return matchesKeyword && matchesDate;
+    });
   }
 }

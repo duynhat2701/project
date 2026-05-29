@@ -86,7 +86,7 @@
       <nz-table
         #borrowTable
         class="table-primary"
-        [nzData]="borrows"
+        [nzData]="filteredBorrows"
         [nzLoading]="loadingBorrows"
         [nzBordered]="false"
         [nzPageSize]="5"
@@ -178,10 +178,28 @@
         <p class="page-subtitle">Theo dõi thiết bị đang được sử dụng và các phiếu đã hoàn tất.</p>
       </div>
 
+      <div class="borrow-search-grid">
+        <input
+          nz-input
+          class="surface-field"
+          [(ngModel)]="borrowSearch.keyword"
+          (ngModelChange)="onBorrowSearchChange()"
+          placeholder="Tìm theo nhân viên hoặc thiết bị"
+        />
+
+        <input
+          nz-input
+          class="surface-field"
+          type="date"
+          [(ngModel)]="borrowSearch.borrowDate"
+          (ngModelChange)="onBorrowSearchChange()"
+        />
+      </div>
+
       <nz-table
         #borrowTable
         class="table-primary"
-        [nzData]="borrows"
+        [nzData]="filteredBorrows"
         [nzLoading]="loadingBorrows"
         [nzBordered]="false"
         [nzPageSize]="5"
